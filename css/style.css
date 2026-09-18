@@ -1,3 +1,52 @@
 * {
 	box-sizing: border-box;
 }
+.record {
+	border: 2px solid orange;
+	padding: 1em;
+	margin-top: 1em;
+}
+
+body {
+	background-color: lightgray;
+	font-family: Georgia, "Times New Roman", Times, serif;
+	font-size: 16px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+#map {
+	width: 80vw;
+	height: 80vh;
+	/* Uses viewport (vw & vh) units: https://css-tricks.com/fun-viewport-units */
+	background-color: white;
+	box-shadow: rgba(0,0,0,0.5) 0 5px 10px;
+}
+
+.mapUp strong{
+	color: #08f;
+	margin-bottom: 1em;
+}
+
+.mapUp{
+	border: 1px solid #08f;
+	border-radius: 10px;
+}
+
+#search-controls {
+	margin-bottom: 1em;
+	display: flex;
+	gap: 0.5em;
+}
+#suburb-input {
+	padding: 0.5em;
+	font-size: 1em;
+}
+#search-button {
+	padding: 0.5em 1em;
+	cursor: pointer;
+}
