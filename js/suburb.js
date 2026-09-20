@@ -24,7 +24,7 @@
     const v = s.scores[f.key];
     return (
       '<div class="bar" data-factor="' + f.key + '">' +
-        '<span class="bar__label"><span aria-hidden="true">' + f.emoji + '</span> ' + SM.esc(f.short) + '</span>' +
+        '<span class="bar__label">' + SM.esc(f.short) + '</span>' +
         '<span class="bar__track" aria-hidden="true"><span class="bar__fill" style="--score:' + v + '"></span></span>' +
         '<span class="bar__num">' + v + '/10</span>' +
       '</div>'
