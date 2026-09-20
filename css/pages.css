@@ -146,3 +146,37 @@ fieldset.choices legend { padding: 0; }
 /* ---------- Under construction (404) ---------- */
 .construction { text-align: center; padding: 5rem var(--gutter); max-width: 40rem; margin: 0 auto; }
 .construction h1 { font-size: clamp(2.5rem, 8vw, 4.5rem); }
+
+
+/* ---------- Suburb map hero ---------- */
+.hero-map {
+  position: relative;
+  isolation: isolate;               /* keeps Leaflet's z-indexes inside this box */
+  height: clamp(14rem, 30vw, 20rem);
+  background: var(--c-grey-200);
+  border-bottom: var(--border);
+  overflow: hidden;
+  transition: height .35s ease;
+}
+.hero-map.is-expanded { height: min(80vh, 46rem); }
+.hero-map #map { width: 100%; height: 100%; }
+
+/* Transparent button over the map while collapsed: a click expands instead of panning */
+.hero-map__open {
+  position: absolute; inset: 0; z-index: 1001;
+  display: flex; align-items: flex-end; justify-content: flex-start;
+  padding: 1.25rem var(--gutter);
+  border: 0; background: transparent; cursor: zoom-in; font: inherit;
+}
+.hero-map.is-expanded .hero-map__open { display: none; }
+.hero-map__hint {
+  padding: .4rem 1rem; border: var(--border); background: var(--c-paper); font-weight: 700;
+}
+.hero-map__open:hover .hero-map__hint { background: var(--c-yellow); }
+
+.hero-map__controls {
+  position: absolute; top: 1rem; right: var(--gutter); z-index: 1002;
+  display: flex; gap: .75rem;
+}
+
+@media (max-width: 40rem) { .hero-map.is-expanded { height: 75vh; } }

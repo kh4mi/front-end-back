@@ -50,7 +50,7 @@
         '<ul class="scores" aria-label="Scores out of 10">' + scores + '</ul>' + distance +
         '<div class="match-card__actions">' +
           '<button class="btn" type="button" data-show="' + s.slug + '">Show on map</button>' +
-          '<a class="btn btn-primary" href="suburb.html?s=' + s.slug + '">View ' + SM.esc(s.name) + '</a>' +
+          '<a class="btn btn-primary" href="suburbSummary.html?s=' + s.slug + '">View ' + SM.esc(s.name) + '</a>' +
         '</div>' +
       '</li>'
     );
@@ -91,7 +91,7 @@
       const icon = L.divIcon({ className: 'map-pin', html: '<span>' + (i + 1) + '</span>', iconSize: [34, 34], iconAnchor: [17, 17], popupAnchor: [0, -18] });
       const m = L.marker([s.lat, s.lng], { icon: icon, title: s.name + ', ' + s.fit + '% fit', alt: s.name })
         .addTo(map)
-        .bindPopup('<strong>' + SM.esc(s.name) + '</strong><br>' + s.fit + '% fit<br><a href="suburb.html?s=' + s.slug + '">View suburb</a>');
+        .bindPopup('<strong>' + SM.esc(s.name) + '</strong><br>' + s.fit + '% fit<br><a href="suburbSummary.html?s=' + s.slug + '">View suburb</a>');
       m.on('click', function () { select(s.slug, false); const c = document.getElementById('card-' + s.slug); if (c) c.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
       markers[s.slug] = m;
       bounds.push([s.lat, s.lng]);

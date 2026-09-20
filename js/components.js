@@ -11,12 +11,13 @@
 (function () {
   'use strict';
 
-  const SITE_NAME = 'SiteName'; // placeholder until the team picks a real name
+  const SITE_NAME = 'suburb.ly';
 
   const NAV = [
     { id: 'how',     label: 'How it works',   href: 'how-it-works.html' },
     { id: 'browse',  label: 'Browse suburbs', href: 'results.html' },
-    { id: 'rentals', label: 'Find a Rental',  href: 'rentals.html' }
+    { id: 'rentals', label: 'Find a Rental',  href: 'rentals.html' },
+    { id: 'saved', label: 'Saved Suburbs', href: 'under-construction.html'}
   ];
 
   const LOGO_ICON =
