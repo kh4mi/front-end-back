@@ -211,8 +211,8 @@ button.chip:hover { background: var(--c-yellow); }
 .bars { display: grid; gap: .9rem; margin: 1.5rem 0 2rem; }
 .bar { display: grid; grid-template-columns: minmax(8.5rem, 11rem) 1fr 3.2rem; align-items: center; gap: .75rem; }
 .bar__label { font-weight: 700; }
-.bar__track { height: 1rem; background: var(--c-grey-200); border: var(--border); }
-.bar__fill { display: block; height: 100%; background: var(--fill, var(--c-blue)); width: calc(var(--score, 0) * 10%); border-right: var(--border); }
+.bar__track { height: 1rem; background: var(--c-grey-200); border: none; }
+.bar__fill { display: block; height: 100%; background: var(--fill, var(--c-blue)); width: calc(var(--score, 0) * 10%); border-right: none; }
 .bar[data-factor="afford"]    { --fill: var(--f-afford); }
 .bar[data-factor="transport"] { --fill: var(--f-transport); }
 .bar[data-factor="safety"]    { --fill: var(--f-safety); }

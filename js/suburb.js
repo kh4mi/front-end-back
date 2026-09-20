@@ -182,7 +182,7 @@ function runSearch(suburb) {
 
 			// Fit the map to the suburb boundary itself, rather than just the stops
 			// This way it zooms to the whole suburb even if it has 0 or 1 stops
-			myMap.fitBounds(currentBoundary.getBounds(), { padding: [10, 10] });
+			myMap.fitBounds(currentBoundary.getBounds(), { padding: [5, 5] });
 			if (markerCoords.length === 0) {
 				alert("No stops found inside \"" + suburb + "\"");
 			}
