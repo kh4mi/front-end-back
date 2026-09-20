@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suburb – SiteName</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/suburb.js" defer></script>
+</head>
+<body>
+  <site-header active="browse"></site-header>
+
+  <main id="main">
+    <section class="suburb-hero" aria-label="Suburb photos">
+      <p>Suburb photo carousel goes here. It needs licensed photos, so it's still to be added.</p>
+      <button class="btn" type="button" id="saveBtn" aria-pressed="false">
+        <svg class="icon icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+        <span id="saveLabel">Save Suburb</span>
+      </button>
+    </section>
+
+    <div class="container suburb-layout" id="content">
+      <section aria-labelledby="suburbName">
+        <h1 id="suburbName">Loading…</h1>
+        <p class="suburb-subtitle" id="suburbSubtitle"></p>
+
+        <h2 class="visually-hidden">Scores out of 10</h2>
+        <div class="bars" id="bars"></div>
+
+        <h2>Nearby amenities</h2>
+        <ul class="chips" id="amenities"></ul>
+        <p class="muted" id="amenityNote" style="margin-top:.75rem"></p>
+
+        <div id="dataNotes"></div>
+      </section>
+
+      <aside aria-label="Suburb facts">
+        <section class="panel">
+          <h2>Community Snapshot</h2>
+          <dl>
+            <dt>Population</dt><dd>Not connected yet</dd>
+            <dt>Median age</dt><dd>Not connected yet</dd>
+            <dt>Demographic</dt><dd>Not connected yet</dd>
+            <dt>Common household type</dt><dd>Not connected yet</dd>
+          </dl>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Planned source: ABS Census.</p>
+        </section>
+        <section class="panel">
+          <h2>Housing Costs</h2>
+          <dl>
+            <dt>Median weekly rent</dt><dd>Not connected yet</dd>
+            <dt>Data updated</dt><dd>Not connected yet</dd>
+          </dl>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Planned source: ABS Census housing costs.</p>
+        </section>
+        <a class="btn btn-primary btn-block btn-lg" id="rentalsLink" href="rentals.html">View rentals <span aria-hidden="true">→</span></a>
+      </aside>
+    </div>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

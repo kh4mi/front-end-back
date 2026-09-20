@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>API test – Brisbane parks</title>
+
+  <!--
+    REFERENCES (required by the DECO1800 brief: external code/data must be cited in comments and visibly on the page)
+    - Data: Brisbane City Council Open Data, "Park – Locations" dataset
+      https://data.brisbane.qld.gov.au/explore/dataset/park-locations/api/
+    - API: Opendatasoft Explore API v2.1 (the platform Brisbane City Council uses to serve its open data)
+      https://data.brisbane.qld.gov.au/api-console/explore/v2.1/
+  -->
+
+  <style>
+    :root {
+      --ink: #111;
+      --paper: #fff;
+      --grey-100: #ececec;
+      --grey-200: #d8d8d8;
+      --grey-600: #666;
+      --error: #a11;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--paper);
+      line-height: 1.5;
+    }
+    header, main, footer { max-width: 1000px; margin: 0 auto; padding: 1.25rem; }
+    header { border-bottom: 2px solid var(--ink); }
+    h1 { margin: 0 0 .25rem; font-size: 1.6rem; }
+    header p { margin: 0; color: var(--grey-600); }
+
+    .controls {
+      display: flex; flex-wrap: wrap; gap: .75rem; align-items: end;
+      padding: 1rem; background: var(--grey-100); border: 2px solid var(--ink);
+    }
+    label { display: flex; flex-direction: column; font-size: .85rem; font-weight: 600; gap: .25rem; }
+    input, select {
+      font: inherit; padding: .5rem .6rem; border: 2px solid var(--ink); background: var(--paper);
+      min-width: 9rem;
+    }
+    button {
+      font: inherit; font-weight: 700; padding: .55rem 1.1rem; cursor: pointer;
+      color: var(--paper); background: var(--ink); border: 2px solid var(--ink);
+    }
+    button:hover { background: #333; }
+    button.secondary { color: var(--ink); background: var(--paper); }
+    button.secondary:hover { background: var(--grey-200); }
+    :focus-visible { outline: 3px solid #06c; outline-offset: 2px; }
+
+    #status { margin: 1rem 0; padding: .75rem 1rem; border-left: 6px solid var(--ink); background: var(--grey-100); }
+    #status.error { border-left-color: var(--error); color: var(--error); background: #fdeeee; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; padding: 0; margin: 1rem 0; list-style: none; }
+    .card { border: 2px solid var(--ink); padding: 1rem; }
+    .card h2 { margin: 0 0 .25rem; font-size: 1.1rem; }
+    .card .meta { color: var(--grey-600); font-size: .85rem; margin: 0 0 .5rem; }
+    .card dl { margin: 0; font-size: .85rem; }
+    .card dt { font-weight: 700; margin-top: .4rem; }
+    .card dd { margin: 0; overflow-wrap: anywhere; }
+
+    pre#raw {
+      overflow: auto; max-height: 24rem; padding: 1rem;
+      background: var(--grey-100); border: 2px solid var(--ink); font-size: .8rem;
+    }
+    footer { border-top: 2px solid var(--ink); font-size: .85rem; color: var(--grey-600); }
+    footer a { color: var(--ink); }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>API test: Brisbane parks</h1>
+    <p>Checks that the browser can call the Brisbane City Council open data API and display the results.</p>
+  </header>
+
+  <main>
+    <section class="controls" aria-label="Request settings">
+      <label>
+        Dataset ID
+        <input id="datasetId" type="text" value="park-locations" spellcheck="false">
+      </label>
+      <label>
+        Records to load
+        <select id="limit">
+          <option>10</option>
+          <option selected>20</option>
+          <option>50</option>
+          <option>100</option>
+        </select>
+      </label>
+      <label>
+        Filter loaded records
+        <input id="filter" type="search" placeholder="e.g. Toowong">
+      </label>
+      <button id="fetchBtn" type="button">Fetch data</button>
+      <button id="rawBtn" class="secondary" type="button" aria-pressed="false">Show raw JSON</button>
+    </section>
+
+    <div id="status" role="status" aria-live="polite">Press “Fetch data” to call the API.</div>
+
+    <ul id="results" class="grid"></ul>
+    <pre id="raw" hidden></pre>
+  </main>
+
+  <footer>
+    <p>
+      Data: <a href="https://data.brisbane.qld.gov.au/explore/dataset/park-locations/api/">Brisbane City Council Open Data – Park Locations</a>.
+      API: <a href="https://data.brisbane.qld.gov.au/api-console/explore/v2.1/">Explore API v2.1</a>.
+    </p>
+  </footer>
+
+  <script>
+    // Base URL of the Brisbane City Council open data API (Opendatasoft Explore API v2.1).
+    const API_BASE = "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets";
+
+    const els = {
+      datasetId: document.getElementById("datasetId"),
+      limit: document.getElementById("limit"),
+      filter: document.getElementById("filter"),
+      fetchBtn: document.getElementById("fetchBtn"),
+      rawBtn: document.getElementById("rawBtn"),
+      status: document.getElementById("status"),
+      results: document.getElementById("results"),
+      raw: document.getElementById("raw"),
+    };
+
+    let records = []; // last successful response
+
+    function setStatus(message, isError = false) {
+      els.status.textContent = message;
+      els.status.classList.toggle("error", isError);
+    }
+
+    // The dataset's field names aren't known in advance, so find likely ones by pattern.
+    function findField(record, pattern) {
+      const key = Object.keys(record).find(
+        (k) => pattern.test(k) && record[k] !== null && record[k] !== "" && typeof record[k] !== "object"
+      );
+      return key ? { key, value: record[key] } : null;
+    }
+
+    function formatValue(value) {
+      if (value === null || value === undefined || value === "") return "–";
+      if (typeof value === "object") return JSON.stringify(value);
+      return String(value);
+    }
+
+    function renderCards() {
+      const term = els.filter.value.trim().toLowerCase();
+      const shown = term
+        ? records.filter((r) => JSON.stringify(r).toLowerCase().includes(term))
+        : records;
+
+      els.results.replaceChildren();
+
+      shown.forEach((record) => {
+        const nameField = findField(record, /name/i);
+        const suburbField = findField(record, /suburb|locality/i);
+
+        const li = document.createElement("li");
+        li.className = "card";
+
+        const title = document.createElement("h2");
+        title.textContent = nameField ? nameField.value : "(no name field found)";
+        li.appendChild(title);
+
+        if (suburbField) {
+          const meta = document.createElement("p");
+          meta.className = "meta";
+          meta.textContent = suburbField.value;
+          li.appendChild(meta);
+        }
+
+        // Show the first few remaining fields so you can see what the dataset contains.
+        const dl = document.createElement("dl");
+        Object.keys(record)
+          .filter((k) => !nameField || k !== nameField.key)
+          .slice(0, 6)
+          .forEach((k) => {
+            const dt = document.createElement("dt");
+            dt.textContent = k;
+            const dd = document.createElement("dd");
+            dd.textContent = formatValue(record[k]);
+            dl.append(dt, dd);
+          });
+        li.appendChild(dl);
+
+        els.results.appendChild(li);
+      });
+
+      if (records.length) {
+        setStatus(`Loaded ${records.length} records. Showing ${shown.length}.`);
+      }
+    }
+
+    async function fetchData() {
+      const datasetId = els.datasetId.value.trim();
+      if (!datasetId) {
+        setStatus("Enter a dataset ID, for example park-locations.", true);
+        return;
+      }
+
+      const url = `${API_BASE}/${encodeURIComponent(datasetId)}/records?limit=${els.limit.value}`;
+      setStatus("Loading…");
+      els.fetchBtn.disabled = true;
+
+      // Give up after 15 seconds so the page never hangs.
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 15000);
+
+      try {
+        const response = await fetch(url, { signal: controller.signal });
+        if (!response.ok) {
+          throw new Error(`The API answered with HTTP ${response.status}. Check the dataset ID on the dataset's API tab.`);
+        }
+        const data = await response.json();
+        records = Array.isArray(data.results) ? data.results : [];
+        els.raw.textContent = JSON.stringify(data, null, 2);
+
+        if (!records.length) {
+          els.results.replaceChildren();
+          setStatus("The request worked but returned no records.", true);
+        } else {
+          renderCards();
+          console.log("First record (use this to see the real field names):", records[0]);
+        }
+      } catch (err) {
+        records = [];
+        els.results.replaceChildren();
+        if (err.name === "AbortError") {
+          setStatus("The request timed out after 15 seconds. Try again.", true);
+        } else if (err instanceof TypeError) {
+          // fetch() throws a TypeError for network failures, including CORS blocks.
+          setStatus("The browser could not reach the API. This is usually a network problem or a CORS block. Open the browser console (F12) for details.", true);
+        } else {
+          setStatus(err.message, true);
+        }
+      } finally {
+        clearTimeout(timer);
+        els.fetchBtn.disabled = false;
+      }
+    }
+
+    els.fetchBtn.addEventListener("click", fetchData);
+    els.filter.addEventListener("input", renderCards);
+    els.rawBtn.addEventListener("click", () => {
+      const showing = els.raw.hidden;
+      els.raw.hidden = !showing;
+      els.rawBtn.setAttribute("aria-pressed", String(showing));
+      els.rawBtn.textContent = showing ? "Hide raw JSON" : "Show raw JSON";
+    });
+  </script>
+</body>
+</html>

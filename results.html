@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your suburb matches – SiteName</title>
+  <!-- Leaflet 1.9.4 (map library) from cdnjs. See references.html -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/results.js" defer></script>
+</head>
+<body>
+  <site-header active="browse"></site-header>
+
+  <main id="main" class="results">
+    <section class="results__list" aria-labelledby="resultsHeading">
+      <div class="results__head">
+        <h1 id="resultsHeading">Finding your matches…</h1>
+        <p class="muted" id="sortNote">Sorted by overall fit</p>
+      </div>
+      <div class="filter-row">
+        <ul class="chips" id="filterChips" aria-label="Your priorities"></ul>
+        <a class="btn" href="quiz.html" style="padding:.25rem .75rem;font-size:.92rem">+ Edit Filters</a>
+      </div>
+      <div id="dataNotes"></div>
+      <ol class="match-list" id="matchList"></ol>
+    </section>
+
+    <section class="results__map" aria-label="Map of matching suburbs">
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

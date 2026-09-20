@@ -1,0 +1,259 @@
+/* ==========================================================================
+   THEME  (shared by every page)
+   Colours, font, spacing and reusable components live here.
+   To re-skin the site, change the variables in :root.
+   ========================================================================== */
+
+/* Font: Open Sauce One. Download from https://www.1001fonts.com/open-sauce-font.html
+   and put the .ttf files in /fonts (see fonts/README.txt). If the files are missing
+   the browser falls back to the system fonts in --font, so nothing breaks. */
+@font-face {
+  font-family: "Open Sauce One";
+  src: local("Open Sauce One Regular"), local("OpenSauceOne-Regular"),
+       url("../fonts/OpenSauceOne-Regular.ttf") format("truetype");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Open Sauce One";
+  src: local("Open Sauce One Medium"), local("OpenSauceOne-Medium"),
+       url("../fonts/OpenSauceOne-Medium.ttf") format("truetype");
+  font-weight: 500; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Open Sauce One";
+  src: local("Open Sauce One SemiBold"), local("OpenSauceOne-SemiBold"),
+       url("../fonts/OpenSauceOne-SemiBold.ttf") format("truetype");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Open Sauce One";
+  src: local("Open Sauce One Bold"), local("OpenSauceOne-Bold"),
+       url("../fonts/OpenSauceOne-Bold.ttf") format("truetype");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Open Sauce One";
+  src: local("Open Sauce One ExtraBold"), local("OpenSauceOne-ExtraBold"),
+       url("../fonts/OpenSauceOne-ExtraBold.ttf") format("truetype");
+  font-weight: 800; font-style: normal; font-display: swap;
+}
+
+:root {
+  /* Brand palette (from the Figma file) */
+  --c-coral:  #FF5757;
+  --c-blue:   #2176AE;
+  --c-sky:    #57B8FF;
+  --c-amber:  #FBB13C;
+  --c-yellow: #F9C846;
+
+  /* Text and background */
+  --c-ink:    #000000;
+  --c-paper:  #FFFFFF;
+
+  /* Neutrals from the wireframes, plus a darker blue for hover states */
+  --c-grey-100: #EDEDED;
+  --c-grey-200: #D8D8D8;
+  --c-grey-600: #595959;
+  --c-blue-dark: #185A86;
+  --c-error: #B00020;
+
+  /* One colour per lifestyle factor (used for score dots and bars).
+     Meaning is never carried by colour alone: every score also shows its number and label. */
+  --f-afford:    var(--c-amber);
+  --f-transport: var(--c-sky);
+  --f-safety:    var(--c-coral);
+  --f-parks:     var(--c-blue);
+
+  /* Type */
+  --font: "Open Sauce One", "Open Sauce", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+
+  /* Layout */
+  --border: 2px solid var(--c-ink);
+  --maxw: 72rem;
+  --gutter: clamp(1rem, 4vw, 3rem);
+  --header-h: 4.5rem;
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--c-ink);
+  background: var(--c-paper);
+}
+h1, h2, h3 { line-height: 1.15; margin: 0 0 .6rem; }
+h1 { font-size: clamp(1.9rem, 4.5vw, 3rem); font-weight: 800; }
+h2 { font-size: clamp(1.4rem, 3vw, 1.9rem); font-weight: 800; }
+h3 { font-size: 1.15rem; font-weight: 700; }
+p { margin: 0 0 1rem; }
+a { color: var(--c-blue); text-underline-offset: .18em; }
+a:hover { color: var(--c-blue-dark); }
+img, svg { max-width: 100%; }
+ul, ol { padding-left: 1.25rem; }
+:focus-visible { outline: 3px solid var(--c-ink); outline-offset: 3px; }
+
+.container { width: 100%; max-width: var(--maxw); margin: 0 auto; padding: 0 var(--gutter); }
+.muted { color: var(--c-grey-600); }
+.lead { font-size: 1.15rem; color: var(--c-grey-600); max-width: 40rem; margin-inline: auto; }
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+[hidden] { display: none !important; }
+.icon { width: 1.25em; height: 1.25em; flex: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute; left: .5rem; top: -4rem; z-index: 2000;
+  background: var(--c-yellow); color: var(--c-ink); padding: .5rem 1rem;
+  border: var(--border); font-weight: 700;
+}
+.skip-link:focus { top: .5rem; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font: inherit; font-weight: 700; line-height: 1.2; text-decoration: none; cursor: pointer;
+  padding: .7rem 1.25rem; color: var(--c-ink); background: var(--c-paper); border: var(--border);
+}
+.btn:hover { background: var(--c-yellow); color: var(--c-ink); }
+.btn-primary { background: var(--c-blue); color: #fff; }
+.btn-primary:hover { background: var(--c-blue-dark); color: #fff; }
+.btn-lg { padding: .9rem 1.75rem; font-size: 1.1rem; }
+.btn-block { display: flex; width: 100%; }
+.btn[disabled], .btn[aria-disabled="true"] { opacity: .45; cursor: not-allowed; }
+.btn[disabled]:hover { background: var(--c-paper); }
+.btn-primary[disabled]:hover { background: var(--c-blue); }
+.btn[aria-pressed="true"] { background: var(--c-yellow); }
+.btn-round {
+  display: inline-grid; place-items: center; width: 2.75rem; height: 2.75rem; padding: 0;
+  border-radius: 50%; border: var(--border); background: var(--c-paper); cursor: pointer; flex: none;
+}
+.btn-round:hover { background: var(--c-yellow); }
+.link-btn { font: inherit; font-weight: 700; color: var(--c-blue); background: none; border: 0; cursor: pointer; text-decoration: underline; padding: 0; }
+
+/* ---------- Header (site-header component) ---------- */
+site-header, site-footer { display: block; }
+/* The custom element itself is the sticky box, so the bar stays put while scrolling. */
+site-header { position: sticky; top: 0; z-index: 1100; }
+.site-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem 1.5rem;
+  padding: .85rem var(--gutter);
+  background: var(--c-paper); border-bottom: var(--border);
+}
+.site-header__logo {
+  display: inline-flex; align-items: center; gap: .5rem;
+  font-size: 1.3rem; font-weight: 800; color: var(--c-ink); text-decoration: none;
+}
+.site-header__logo svg { width: 1.6rem; height: 1.6rem; }
+.site-nav { display: flex; flex-wrap: wrap; gap: .25rem clamp(1rem, 3vw, 2.5rem); }
+.site-nav a {
+  color: var(--c-ink); text-decoration: none; padding: .25rem 0;
+  border-bottom: 3px solid transparent;
+}
+.site-nav a:hover { border-bottom-color: var(--c-yellow); }
+.site-nav a[aria-current="page"] { font-weight: 800; border-bottom-color: var(--c-coral); }
+
+/* ---------- Footer (site-footer component) ---------- */
+.site-footer { background: var(--c-ink); color: #fff; margin-top: 4rem; padding: 2.5rem var(--gutter) 2rem; }
+.site-footer a { color: #fff; }
+.site-footer a:hover { color: var(--c-yellow); }
+.site-footer :focus-visible { outline-color: #fff; }
+.site-footer__grid { display: grid; gap: 2rem; grid-template-columns: 2fr 1fr 1fr; max-width: var(--maxw); margin: 0 auto; }
+.site-footer h2 { font-size: 1rem; margin-bottom: .5rem; color: var(--c-yellow); }
+.site-footer ul { list-style: none; padding: 0; margin: 0; }
+.site-footer li { margin-bottom: .35rem; }
+.site-footer__brand { font-size: 1.3rem; font-weight: 800; margin-bottom: .5rem; }
+.site-footer__small { max-width: var(--maxw); margin: 2rem auto 0; padding-top: 1rem; border-top: 1px solid #555; font-size: .85rem; color: #d0d0d0; }
+@media (max-width: 720px) { .site-footer__grid { grid-template-columns: 1fr; } }
+
+/* ---------- Reusable components ---------- */
+.card { border: var(--border); background: var(--c-paper); padding: 1.1rem 1.25rem; }
+.panel { border: var(--border); padding: 1.25rem; margin-bottom: 1.25rem; background: var(--c-paper); }
+.panel h2 { font-size: 1.15rem; margin-bottom: .75rem; }
+
+.notice { border: var(--border); border-left-width: .6rem; background: var(--c-paper); padding: .75rem 1rem; margin: 1rem 0; font-size: .92rem; }
+.notice--warn { border-left-color: var(--c-amber); background: #FFF6DE; }
+.notice--info { border-left-color: var(--c-sky); }
+.notice--error { border-left-color: var(--c-coral); }
+.notice p { margin: 0 0 .35rem; }
+.notice p:last-child { margin-bottom: 0; }
+
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; list-style: none; padding: 0; margin: 0; }
+.chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  border: 2px dashed var(--c-ink); background: var(--c-paper);
+  padding: .2rem .65rem; font: inherit; font-size: .92rem; color: var(--c-ink);
+}
+button.chip { cursor: pointer; }
+button.chip:hover { background: var(--c-yellow); }
+.pill { display: inline-block; border: var(--border); border-radius: 999px; padding: .15rem .85rem; background: var(--c-paper); font-size: .95rem; white-space: nowrap; }
+
+/* Score chips: a coloured square + emoji + "8/10" */
+.scores { display: flex; flex-wrap: wrap; gap: .4rem; list-style: none; padding: 0; margin: .5rem 0 0; }
+.score { display: inline-flex; align-items: center; gap: .3rem; border: 2px solid var(--c-ink); padding: .1rem .45rem; font-size: .85rem; font-weight: 600; background: var(--c-paper); }
+.score::before { content: ""; width: .6rem; height: .6rem; background: var(--fc, var(--c-grey-200)); border: 1.5px solid var(--c-ink); }
+.score[data-factor="afford"]    { --fc: var(--f-afford); }
+.score[data-factor="transport"] { --fc: var(--f-transport); }
+.score[data-factor="safety"]    { --fc: var(--f-safety); }
+.score[data-factor="parks"]     { --fc: var(--f-parks); }
+
+/* Score bars on the suburb page */
+.bars { display: grid; gap: .9rem; margin: 1.5rem 0 2rem; }
+.bar { display: grid; grid-template-columns: minmax(8.5rem, 11rem) 1fr 3.2rem; align-items: center; gap: .75rem; }
+.bar__label { font-weight: 700; }
+.bar__track { height: 1rem; background: var(--c-grey-200); border: var(--border); }
+.bar__fill { display: block; height: 100%; background: var(--fill, var(--c-blue)); width: calc(var(--score, 0) * 10%); border-right: var(--border); }
+.bar[data-factor="afford"]    { --fill: var(--f-afford); }
+.bar[data-factor="transport"] { --fill: var(--f-transport); }
+.bar[data-factor="safety"]    { --fill: var(--f-safety); }
+.bar[data-factor="parks"]     { --fill: var(--f-parks); }
+.bar__num { font-weight: 700; text-align: right; }
+@media (max-width: 520px) { .bar { grid-template-columns: 1fr 3rem; } .bar__label { grid-column: 1 / -1; } }
+
+/* Form controls */
+label { font-weight: 600; }
+input[type="text"], input[type="search"], input[type="email"], input[type="password"], input[type="number"], select {
+  font: inherit; color: var(--c-ink); background: var(--c-paper);
+  border: var(--border); padding: .6rem .75rem; min-width: 0; width: 100%;
+}
+input[type="checkbox"], input[type="radio"] { width: 1.15rem; height: 1.15rem; accent-color: var(--c-blue); flex: none; }
+.field { display: flex; flex-direction: column; gap: .3rem; margin-bottom: 1rem; }
+.field-error { color: var(--c-error); font-weight: 600; margin: .5rem 0 0; }
+.check { display: flex; gap: .6rem; align-items: flex-start; font-weight: 400; }
+.check input { margin-top: .25rem; }
+
+/* Search box (used on home and rentals pages) */
+.search-form { display: flex; align-items: center; gap: .5rem; max-width: 46rem; margin: 0 auto; border: var(--border); background: var(--c-paper); padding: .25rem .5rem .25rem .9rem; }
+.search-form input[type="search"] { border: 0; padding: .75rem .25rem; font-size: 1.05rem; }
+.search-form input:focus-visible { outline: none; }
+.search-form:focus-within { outline: 3px solid var(--c-ink); outline-offset: 3px; }
+.search-form button { border: 0; background: none; cursor: pointer; padding: .5rem; display: grid; place-items: center; }
+.search-form button:hover { background: var(--c-yellow); }
+
+/* Listing card (used on home and rentals pages) */
+.listing { display: flex; flex-direction: column; gap: .35rem; }
+.listing__media { position: relative; aspect-ratio: 16 / 10; display: grid; place-items: center; background: var(--c-grey-200); border: var(--border); color: var(--c-grey-600); font-size: .9rem; }
+.listing__row { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+.listing__price { font-size: 1.6rem; font-weight: 800; margin: 0; }
+.listing__price span { font-size: .9rem; font-weight: 500; color: var(--c-grey-600); }
+.listing__addr { margin: 0; font-size: .92rem; }
+.listing__fit { display: inline-flex; align-items: center; gap: .3rem; margin: 0; font-weight: 800; white-space: nowrap; }
+.listing__facts { display: flex; gap: 1rem; list-style: none; padding: 0; margin: 0; font-weight: 700; }
+.listing__facts li { display: inline-flex; align-items: center; gap: .3rem; }
+.save-btn {
+  position: absolute; top: .5rem; right: .5rem; display: grid; place-items: center;
+  width: 2.5rem; height: 2.5rem; border: var(--border); border-radius: 50%; background: var(--c-paper); cursor: pointer; color: var(--c-ink);
+}
+.save-btn:hover { background: var(--c-yellow); }
+.save-btn[aria-pressed="true"] { background: var(--c-amber); }
+[aria-pressed="true"] .icon-star path { fill: currentColor; }

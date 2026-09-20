@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign up – SiteName</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="js/components.js" defer></script>
+  <script src="js/signup.js" defer></script>
+</head>
+<body>
+  <site-header></site-header>
+
+  <main id="main" class="auth">
+    <div class="auth-card">
+      <div class="auth-head">
+        <h1 id="authTitle">Sign up</h1>
+        <button class="link-btn" type="button" id="switchMode">Log in</button>
+      </div>
+
+      <form id="authForm">
+        <div class="field" id="nameField">
+          <label for="fullName">Full name</label>
+          <input id="fullName" type="text" autocomplete="name" required>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password" minlength="8" required>
+        </div>
+        <label class="check" id="agreeField" for="agree" style="margin-bottom:1.25rem">
+          <input id="agree" type="checkbox" required>
+          <span>I agree to the Terms and Privacy Policy, including how my quiz data is used (see <a href="how-it-works.html#privacy">How it works</a>).</span>
+        </label>
+        <button class="btn btn-primary btn-block btn-lg" type="submit" id="submitBtn">Create Account</button>
+      </form>
+      <p class="auth-note">Prototype only: no account is created, and nothing you type here is sent or stored.</p>
+    </div>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

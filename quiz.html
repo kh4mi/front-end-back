@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Suburb matching quiz – SiteName</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/quiz.js" defer></script>
+</head>
+<body>
+  <site-header active="browse"></site-header>
+
+  <main id="main" class="quiz-layout">
+    <aside class="quiz-intro">
+      <h1>Let's get to know you, to find your future home!</h1>
+      <p>Your future home is more than just a roof over your head. It's a place for connection, for community. We take into account what you value, and personalise matching rental listings for you.</p>
+    </aside>
+
+    <div class="quiz-main">
+      <p class="visually-hidden">Suburb Matching Quiz</p>
+      <p class="quiz-progress" id="progressText" aria-live="polite">Question 1 of 5</p>
+      <div class="progress-bar" aria-hidden="true"><span id="progressFill"></span></div>
+
+      <form id="quizForm" novalidate>
+        <!-- Step 1: rank + rate -->
+        <section class="step" data-step="1">
+          <h2 tabindex="-1">Rank what matters most to you</h2>
+          <p class="muted">Drag to reorder, or use the arrow buttons. Use the rating to set how much each factor matters (1 = a little, 5 = a lot).</p>
+          <ol class="rank-list" id="rankList"></ol>
+          <p class="visually-hidden" id="rankLive" role="status" aria-live="polite"></p>
+        </section>
+
+        <!-- Step 2: budget -->
+        <section class="step" data-step="2" hidden>
+          <h2 tabindex="-1">What can you spend on rent each week?</h2>
+          <p class="muted">Optional. We'll use this to filter rentals. Leave it blank if you're not sure yet.</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="budgetMin">From (per week)</label>
+              <span class="input-prefix"><input id="budgetMin" type="number" min="0" step="25" inputmode="numeric"></span>
+            </div>
+            <div class="field">
+              <label for="budgetMax">To (per week)</label>
+              <span class="input-prefix"><input id="budgetMax" type="number" min="0" step="25" inputmode="numeric"></span>
+            </div>
+          </div>
+          <p class="field-error" id="budgetError" role="alert" hidden></p>
+        </section>
+
+        <!-- Step 3: destination -->
+        <section class="step" data-step="3" hidden>
+          <h2 tabindex="-1">Where will you spend most of your time?</h2>
+          <p class="muted">We'll show the straight-line distance from each suburb to this place.</p>
+          <fieldset class="choices">
+            <legend class="visually-hidden">Main destination</legend>
+            <label class="choice"><input type="radio" name="destination" value="uq"> UQ St Lucia</label>
+            <label class="choice"><input type="radio" name="destination" value="qut"> QUT Gardens Point</label>
+            <label class="choice"><input type="radio" name="destination" value="cbd"> Brisbane CBD</label>
+            <label class="choice"><input type="radio" name="destination" value="other"> Somewhere else / not sure yet</label>
+          </fieldset>
+        </section>
+
+        <!-- Step 4: bedrooms -->
+        <section class="step" data-step="4" hidden>
+          <h2 tabindex="-1">How many bedrooms do you need?</h2>
+          <p class="muted">The minimum number of bedrooms for rentals.</p>
+          <fieldset class="choices">
+            <legend class="visually-hidden">Minimum bedrooms</legend>
+            <label class="choice"><input type="radio" name="beds" value="1"> 1 or more</label>
+            <label class="choice"><input type="radio" name="beds" value="2"> 2 or more</label>
+            <label class="choice"><input type="radio" name="beds" value="3"> 3 or more</label>
+            <label class="choice"><input type="radio" name="beds" value="4"> 4 or more</label>
+          </fieldset>
+        </section>
+
+        <!-- Step 5: review + consent -->
+        <section class="step" data-step="5" hidden>
+          <h2 tabindex="-1">Check your answers</h2>
+          <dl class="review" id="review"></dl>
+          <div class="consent-box">
+            <label class="check" for="consent">
+              <input type="checkbox" id="consent">
+              <span>I consent to letting my quiz responses personalise my results.</span>
+            </label>
+            <p class="muted" style="margin:.5rem 0 0">Required to use the matching tool. Your answers are stored only in this browser, and you can withdraw consent at any time on the <a href="how-it-works.html#privacy">How it works</a> page.</p>
+            <p class="field-error" id="consentError" role="alert" hidden>Please tick the box to see your matches.</p>
+          </div>
+        </section>
+
+        <div class="quiz-nav">
+          <button type="button" class="btn" id="backBtn">Back</button>
+          <button type="button" class="btn btn-primary" id="nextBtn">Next</button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

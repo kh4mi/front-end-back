@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find a rental – SiteName</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/rentals.js" defer></script>
+</head>
+<body>
+  <site-header active="rentals"></site-header>
+
+  <main id="main" class="container rentals">
+    <h1 class="visually-hidden">Find a rental</h1>
+
+    <div class="rentals-top">
+      <form id="searchForm" class="search-form" role="search">
+        <span aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+        </span>
+        <label class="visually-hidden" for="q">Search rentals by suburb, street or postcode</label>
+        <input id="q" type="search" placeholder="Find your next place to live!" autocomplete="off">
+        <button type="submit" aria-label="Search">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg>
+        </button>
+      </form>
+      <button class="btn btn-lg" type="button" id="savedBtn" aria-pressed="false">
+        <svg class="icon icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+        Saved Listings (<span id="savedCount">0</span>)
+      </button>
+    </div>
+
+    <div class="filter-row">
+      <button class="btn btn-primary" type="button" id="editFilters" aria-expanded="false" aria-controls="filterPanel">+ Edit Filters</button>
+      <ul class="chips" id="filterChips" aria-label="Active filters"></ul>
+      <p class="result-count" id="resultCount" role="status" aria-live="polite"></p>
+    </div>
+
+    <form class="filter-panel" id="filterPanel" hidden>
+      <div class="field">
+        <label for="fSuburb">Suburb</label>
+        <select id="fSuburb"><option value="">Any suburb</option></select>
+      </div>
+      <div class="field">
+        <label for="fBeds">Bedrooms</label>
+        <select id="fBeds">
+          <option value="0">Any</option><option value="1">1+</option><option value="2">2+</option><option value="3">3+</option><option value="4">4+</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fMin">Min rent ($/wk)</label>
+        <input id="fMin" type="number" min="0" step="25" inputmode="numeric">
+      </div>
+      <div class="field">
+        <label for="fMax">Max rent ($/wk)</label>
+        <input id="fMax" type="number" min="0" step="25" inputmode="numeric">
+      </div>
+      <button class="btn" type="button" id="clearFilters">Clear filters</button>
+    </form>
+
+    <div class="notice notice--warn">
+      <p><strong>Sample listings.</strong> These rentals and addresses are made up for the prototype. The "fit" number beside each listing is how well its suburb matches your priorities.</p>
+    </div>
+
+    <div class="listing-grid" id="listings"></div>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>
