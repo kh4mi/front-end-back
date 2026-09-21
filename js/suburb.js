@@ -15,7 +15,7 @@
 
   initMap(s.name);
 
-  document.title = s.name + ' – SiteName';
+  document.title = s.name + ' – suburb.ly';
   $('#suburbName').textContent = s.name;
   $('#suburbSubtitle').textContent = s.fit + '% fit · ' + s.kmCbd.toFixed(1) + ' km from Brisbane CBD · Postcode ' + s.postcode;
 
