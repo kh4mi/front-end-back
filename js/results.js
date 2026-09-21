@@ -27,8 +27,7 @@
   if (prefs) {
     chipsEl.innerHTML = prefs.order
       .filter((k) => prefs.weights[k] >= 3)
-      .map((k) => '<li class="chip">' + SM.esc(SM.factor(k).short) + ': ' + SM.level(prefs.weights[k]) + '</li>')
-      .join('');
+.map((k) => '<li class="chip" data-factor="' + k + '">' + SM.esc(SM.factor(k).short) + ': ' + SM.level(prefs.weights[k]) + '</li>')      .join('');
   }
 
   const notes = SM.dataNotes(data.parkInfo).map((t) => '<p>' + SM.esc(t) + '</p>');
