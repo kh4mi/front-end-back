@@ -8,7 +8,7 @@ A static website: no build step, no server needed. Open `index.html` in a browse
 | `index.html` | Landing page, search box, sample rentals carousel |
 | `quiz.html` | 5-question matching quiz (saves answers in the browser) |
 | `results.html` | Ranked suburbs + Leaflet map |
-| `suburb.html?s=toowong` | Suburb detail page |
+| `suburbSummary.html?s=toowong` | Suburb detail page |
 | `rentals.html` | Find a rental (sample listings, filters, saved) |
 | `how-it-works.html` | Scoring explanation, data sources, privacy + consent |
 | `signup.html` | Sign up / log in form (front end only) |
@@ -28,12 +28,3 @@ Open the browser console (F12) on the results page to see which fields it found.
 ## Placeholder data (replace these)
 - `data/suburbs.js`: the `sample` scores for affordability, transport and safety are **made up**. Replace each as its dataset is connected.
 - `data/rentals.js`: made-up listings. To go live, see "Rental listings" below.
-
-## Rental listings
-Domain's developer API has a residential listings search, but the key can't sit in front-end code. You'd need a small server-side proxy. Domain's terms also ask you to show a "powered by Domain" logo, link to the original listing, and not store listing data. Until then, the sample file keeps the screens working.
-
-## Before you submit
-- Add the font files (see `fonts/README.txt`).
-- Fill in the licence names and the AHURI citation on `references.html`.
-- Link your slides and prototype material from the home page of your team zone, as the brief requires.
-- Complete the AI Use Declaration (this code was written with AI assistance and the team should describe how it was checked and changed).
