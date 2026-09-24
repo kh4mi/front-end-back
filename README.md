@@ -22,8 +22,10 @@ A static website: no build step, no server needed. Open `index.html` in a browse
 - **`js/app.js`**: shared logic (saved data, parks API, matching, listing cards).
 
 ## Live data
-`js/app.js` (section 3) calls the Brisbane City Council "Park – Locations" dataset. It looks at the first record to find the real field names, downloads every park, counts parks per suburb, and turns the counts into the Parks & Rec score.
-Open the browser console (F12) on the results page to see which fields it found. If the numbers look wrong, that log is the first thing to check.
+`js/app.js` calls the Brisbane City Council "Park – Locations" dataset. It looks at the first record to find the real field names, downloads every park, counts parks per suburb, and turns the counts into the Parks & Rec score.
+`js/suburb.js` calls the Brisbane City Council "Suburb Boundaries" dataset AND static SEQ GTFS information (data/___.txt files).
+BCC dataset uses geoshape of suburb to show the clear suburb lines,
+and GTFS information is used currently to marker the stops.
 
 ## Placeholder data (replace these)
 - `data/suburbs.js`: the `sample` scores for affordability, transport and safety are **made up**. Replace each as its dataset is connected.
