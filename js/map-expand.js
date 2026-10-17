@@ -5,7 +5,6 @@
 	var mapEl = document.getElementById("map");
 	var openBtn = hero.querySelector(".hero-map__open");
 	var closeBtn = hero.querySelector(".hero-map__close");
-	var saveBtn = hero.querySelector(".hero-map__save");
 
 	function setExpanded(expanded) {
 		hero.classList.toggle("is-expanded", expanded);
@@ -42,13 +41,7 @@
 		}
 	}).observe(mapEl);
 
-	// Save Suburb toggle (NEED TO HOOK SAVED LINK HERE)
-	saveBtn.addEventListener("click", function () {
-		var saved = saveBtn.getAttribute("aria-pressed") !== "true";
-		saveBtn.setAttribute("aria-pressed", String(saved));
-		saveBtn.firstElementChild.textContent = saved ? "★" : "☆";
-		saveBtn.querySelector(".hero-map__save-text").textContent = saved ? "Saved" : "Save Suburb";
-	});
+	// The Save Suburb button (.hero-map__save) is wired up in js/suburb.js, which saves it in the browser.
 
 	setExpanded(false);
 })();

@@ -17,10 +17,10 @@
      1. Factors, destinations, icons, helpers
      ------------------------------------------------------------------ */
   SM.FACTORS = [
-    { key: 'afford',    label: 'Affordability',      short: 'Affordability', emoji: '💲' },
-    { key: 'transport', label: 'Transport',          short: 'Transport',     emoji: '🚌' },
-    { key: 'safety',    label: 'Safety',             short: 'Safety',        emoji: '🛡️' },
-    { key: 'parks',     label: 'Parks & Recreation', short: 'Parks & Rec',   emoji: '🌳' }
+    { key: 'afford',    label: 'Affordability',      short: 'Affordability' },
+    { key: 'transport', label: 'Transport',          short: 'Transport' },
+    { key: 'safety',    label: 'Safety',             short: 'Safety' },
+    { key: 'parks',     label: 'Parks & Recreation', short: 'Parks & Rec' }
   ];
   SM.factor = (key) => SM.FACTORS.find((f) => f.key === key);
 
@@ -64,25 +64,36 @@
     return 2 * R * Math.asin(Math.sqrt(h));
   };
 
+  // A 1–10 score as text, or "No data" when a suburb has none
+  SM.scoreText = (v) => (v === null || v === undefined ? 'No data' : v + '/10');
+
   // 1–5 importance rating -> word used in filter chips
   SM.level = (rating) => (rating >= 4 ? 'High' : rating === 3 ? 'Medium' : 'Low');
 
   /* ------------------------------------------------------------------
      2. Saved data (localStorage) and quiz answers
         Everything stays in the visitor's own browser. Nothing is sent anywhere.
+        When someone is logged in (demo accounts, see js/signup.js), their quiz answers
+        and saved items are kept under their own account: sm.user.<email>.<key>
      ------------------------------------------------------------------ */
+  function storePrefix() {
+    try {
+      const session = JSON.parse(window.localStorage.getItem('sm.session') || 'null');
+      return session && session.email ? 'sm.user.' + session.email + '.' : 'sm.';
+    } catch (e) { return 'sm.'; }
+  }
   SM.store = {
     get(key, fallback) {
       try {
-        const v = window.localStorage.getItem('sm.' + key);
+        const v = window.localStorage.getItem(storePrefix() + key);
         return v === null ? fallback : JSON.parse(v);
       } catch (e) { return fallback; }
     },
     set(key, value) {
-      try { window.localStorage.setItem('sm.' + key, JSON.stringify(value)); return true; } catch (e) { return false; }
+      try { window.localStorage.setItem(storePrefix() + key, JSON.stringify(value)); return true; } catch (e) { return false; }
     },
     remove(key) {
-      try { window.localStorage.removeItem('sm.' + key); } catch (e) { /* ignore */ }
+      try { window.localStorage.removeItem(storePrefix() + key); } catch (e) { /* ignore */ }
     }
   };
 
@@ -126,7 +137,7 @@
           d) turn counts into a 1–10 score (see SM.buildSuburbs)
      ------------------------------------------------------------------ */
   const PARKS_BASE = 'https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/park-locations';
-  const PARKS_CACHE_KEY = 'sm.parks.v1';
+  const PARKS_CACHE_KEY = 'sm.parks.v3'; // v3: also keeps each park's location (for the suburb map)
   const RADIUS_KM = 1.5;
 
   async function getJson(url) {
@@ -180,11 +191,13 @@
 
   function summariseParks(rows, fields) {
     const bySuburb = {};
-    SM.SUBURBS.forEach((s) => { bySuburb[s.slug] = { count: 0, names: [] }; });
+    SM.SUBURBS.forEach((s) => { bySuburb[s.slug] = { count: 0, names: [], points: [] }; });
     const add = (slug, row) => {
       bySuburb[slug].count += 1;
       const nm = fields.name ? row[fields.name] : null;
       if (nm) bySuburb[slug].names.push(String(nm));
+      const pt = fields.geo ? readPoint(row[fields.geo]) : null;
+      if (pt) bySuburb[slug].points.push({ name: nm ? String(nm) : 'Park', lat: +pt.lat.toFixed(5), lng: +pt.lng.toFixed(5) });
     };
 
     let method = 'suburb-field';
@@ -231,7 +244,7 @@
         try { window.sessionStorage.setItem(PARKS_CACHE_KEY, JSON.stringify(info)); } catch (e) { /* too big or blocked */ }
         return info;
       } catch (err) {
-        console.warn('[SM] Live parks data unavailable, using sample scores.', err);
+        console.warn('[SM] Live parks data unavailable, so parks are left out of the match.', err);
         return { ok: false, error: String(err && err.message ? err.message : err) };
       }
     })();
@@ -241,48 +254,136 @@
   /* ------------------------------------------------------------------
      4. Matching
      ------------------------------------------------------------------ */
-  // Builds the suburb list with 1–10 scores. Pass parkInfo from SM.loadParks(), or null for sample-only.
+  /* Builds the suburb list with 1–10 scores. Pass parkInfo from SM.loadParks(), or null to skip live parks.
+     transport and safety come ready-made from data/suburbs.js (tools/build-suburbs.py).
+     A score is null when that suburb has no data (e.g. no rental listings).
+     SM.available says which factors have data at all, e.g. parks is false if the Council API is down. */
   SM.buildSuburbs = function (parkInfo) {
     const list = SM.SUBURBS.map((s) => Object.assign({}, s, {
-      scores: Object.assign({}, s.sample),
+      scores: { afford: null, transport: s.transport, safety: s.safety, parks: null },
       parkCount: null,
       parkNames: [],
+      parkPoints: [],
       parksLive: false,
       kmCbd: SM.km(s, SM.CBD)
     }));
 
     if (parkInfo && parkInfo.ok) {
       // Parks score = where the suburb ranks for number of parks, mapped onto 1–10.
-      const counts = list.map((s) => parkInfo.bySuburb[s.slug].count);
+      const park = (s) => parkInfo.bySuburb[s.slug] || { count: 0, names: [], points: [] };
+      const counts = list.map((s) => park(s).count);
       list.forEach((s, i) => {
         const fewer = counts.filter((c) => c < counts[i]).length;
         s.scores.parks = Math.max(1, Math.min(10, 1 + Math.round((9 * fewer) / (list.length - 1))));
         s.parkCount = counts[i];
-        s.parkNames = parkInfo.bySuburb[s.slug].names;
+        s.parkNames = park(s).names;
+        s.parkPoints = park(s).points || [];
         s.parksLive = true;
       });
     }
+
+    // Affordability score comes ready-made from data/suburbs.js: where the suburb's ABS 2021 Census median weekly rent
+    // ranks (cheapest = 10). The listings' median asking rent (data/rentals.js) is kept for the suburb page.
+    list.forEach((s) => {
+      s.scores.afford = typeof s.afford === 'number' ? s.afford : null;
+      s.affordLive = s.scores.afford !== null;
+      if (Array.isArray(SM.RENTALS)) s.medianRent = SM.rentStats(s.slug).median;
+    });
+    SM.available = {};
+    SM.FACTORS.forEach((f) => { SM.available[f.key] = list.some((s) => s.scores[f.key] !== null); });
     return list;
   };
 
-  // Weight for each factor. Rating (1–5) matters most; position in the ranking breaks ties.
+  /* How a quiz rating (1 = doesn't matter … 5 = very important) turns into a weight.
+     The steps grow fast on purpose: with gentle weights, a suburb that is decent at
+     everything (e.g. Toowong) wins no matter what you pick. 1 means "ignore this factor". */
+  SM.RATING_WEIGHT = { 1: 0, 2: 1, 3: 2, 4: 4, 5: 7 };
+  // Ranking breaks ties between equal ratings: 1st place counts 30% more than 4th.
+  SM.RANK_BONUS = 0.1;
+  // Weight for the extra parts that only exist when you answered the budget, bedrooms or destination questions.
+  SM.EXTRA_WEIGHT = 4; // the same as rating something 4 ("important")
+  SM.COMMUTE_ZERO_KM = 15; // this far (straight line) or more from your destination scores 1/10
+
+  SM.NO_DATA_SCORE = 5; // a suburb missing one score is counted as average for it, not best or worst
+
   SM.weightsFor = function (prefs) {
     const w = {};
-    if (!prefs) { SM.FACTORS.forEach((f) => { w[f.key] = 1; }); return w; } // no quiz yet: equal weights
+    const usable = (k) => !SM.available || SM.available[k] !== false; // factors with no data anywhere are left out
+    if (!prefs) { SM.FACTORS.forEach((f) => { w[f.key] = usable(f.key) ? 1 : 0; }); return w; } // no quiz yet: equal weights
     const n = prefs.order.length;
-    prefs.order.forEach((key, i) => { w[key] = (prefs.weights[key] || 3) + (n - 1 - i) * 0.25; });
+    prefs.order.forEach((key, i) => {
+      const rating = prefs.weights[key] || 3;
+      w[key] = usable(key) ? (SM.RATING_WEIGHT[rating] !== undefined ? SM.RATING_WEIGHT[rating] : 2) * (1 + (n - 1 - i) * SM.RANK_BONUS) : 0;
+    });
+    // Everything rated 1: fall back to equal weights so every suburb isn't 0%
+    if (!Object.keys(w).some((k) => w[k] > 0)) SM.FACTORS.forEach((f) => { w[f.key] = usable(f.key) ? 1 : 0; });
     return w;
   };
 
-  // Adds `fit` (0–100) to each suburb and returns a copy sorted best-first.
-  SM.applyFit = function (list, prefs) {
+  // The parts that make up a suburb's fit for these quiz answers: the four factors, plus
+  // "rentals that fit you" (budget + bedrooms) and "distance to your destination" when answered.
+  // Each part has a 1–10 score and a weight; fit = weighted average, as a %.
+  SM.fitParts = function (s, prefs) {
     const w = SM.weightsFor(prefs);
-    const totalWeight = Object.keys(w).reduce((sum, k) => sum + w[k], 0);
+    const keys = prefs ? prefs.order : SM.FACTORS.map((f) => f.key);
+    const parts = keys.map((k) => (s.scores[k] === null
+      ? { key: k, label: SM.factor(k).label, score: SM.NO_DATA_SCORE, weight: w[k], note: 'no data, counted as average' }
+      : { key: k, label: SM.factor(k).label, score: s.scores[k], weight: w[k] }));
+    if (!prefs) return parts;
+
+    // Budget and bedrooms: share of this suburb's listings you could actually rent
+    const hasBudget = prefs.budget && prefs.budget.max !== null;
+    if ((hasBudget || prefs.beds > 1) && Array.isArray(SM.RENTALS)) {
+      const here = SM.RENTALS.filter((l) => l.slug === s.slug);
+      if (here.length) { // no listings: leave it out rather than guess
+        const ok = here.filter((l) => (!hasBudget || l.price <= prefs.budget.max) && l.beds >= (prefs.beds || 1)).length;
+        parts.push({
+          key: 'rentfit', label: 'Rentals in your budget', weight: SM.EXTRA_WEIGHT,
+          score: Math.round(1 + 9 * (ok / here.length)),
+          note: ok + ' of ' + here.length + ' listings'
+        });
+      }
+    }
+    // Destination: straight-line distance to where you'll spend most of your time
+    const dest = SM.DESTINATIONS[prefs.destination];
+    if (dest && dest.label) {
+      const km = SM.km(s, dest);
+      parts.push({
+        key: 'commute', label: 'Close to ' + dest.label, weight: SM.EXTRA_WEIGHT,
+        score: Math.max(1, Math.min(10, Math.round(10 - (9 * km) / SM.COMMUTE_ZERO_KM))),
+        note: km.toFixed(1) + ' km'
+      });
+    }
+    return parts;
+  };
+
+  // Adds `fit` (0–100) and `parts` to each suburb and returns a copy sorted best-first.
+  SM.applyFit = function (list, prefs) {
     list.forEach((s) => {
-      const weighted = Object.keys(w).reduce((sum, k) => sum + w[k] * s.scores[k], 0);
-      s.fit = Math.round((weighted / (totalWeight * 10)) * 100);
+      s.parts = SM.fitParts(s, prefs);
+      const total = s.parts.reduce((sum, p) => sum + p.weight, 0);
+      const weighted = s.parts.reduce((sum, p) => sum + p.weight * p.score, 0);
+      s.fit = total ? Math.round((weighted / (total * 10)) * 100) : 0;
     });
     return list.slice().sort((a, b) => b.fit - a.fit || a.name.localeCompare(b.name));
+  };
+
+  // How each part adds up to a suburb's fit, for the "Why this match?" breakdown.
+  // Each part can add up to `max` points (its share of the weights); it earns `points` of
+  // those in proportion to its 1–10 score. Points are rounded so they add up to exactly `fit`.
+  SM.fitBreakdown = function (s) {
+    const parts = s.parts.filter((p) => p.weight > 0);
+    const total = parts.reduce((sum, p) => sum + p.weight, 0);
+    const rows = parts.map(function (p) {
+      const exact = (p.weight * p.score / (total * 10)) * 100;
+      return { key: p.key, label: p.label, score: p.score, note: p.note, max: Math.round((p.weight / total) * 100), exact: exact, points: Math.floor(exact) };
+    });
+    // Largest remainder rounding
+    let left = s.fit - rows.reduce((sum, r) => sum + r.points, 0);
+    rows.slice().sort((a, b) => (b.exact - b.points) - (a.exact - a.points)).forEach(function (r) {
+      if (left > 0) { r.points += 1; left -= 1; }
+    });
+    return rows;
   };
 
   // Everything a page needs, in one call.
@@ -290,7 +391,7 @@
     const parkInfo = await SM.loadParks();
     return SM.compose(SM.buildSuburbs(parkInfo), parkInfo);
   };
-  // Same as init but instant: uses sample scores only (no network).
+  // Same as init but instant: no live parks (no network).
   SM.initSample = function () { return SM.compose(SM.buildSuburbs(null), null); };
   SM.compose = function (suburbs, parkInfo) {
     const prefs = SM.getPrefs();
@@ -300,30 +401,50 @@
     return { suburbs: suburbs, ranked: ranked, bySlug: bySlug, prefs: prefs, parkInfo: parkInfo };
   };
 
-  // Text for the "where does this data come from" notices.
-  SM.dataNotes = function (parkInfo) {
-    const notes = [];
-    if (parkInfo && parkInfo.ok) {
-      notes.push('Parks scores are calculated live from Brisbane City Council open data (' + parkInfo.total.toLocaleString('en-AU') + ' park records).');
-    } else if (parkInfo) {
-      notes.push('Live parks data could not be loaded, so parks scores are sample values.');
-    }
-    notes.push('Affordability, transport and safety scores are sample values for now, while the ABS, Translink and QPS datasets are being connected.');
-    return notes;
-  };
-
   /* ------------------------------------------------------------------
      5. Listing card HTML (used by the home and rentals pages)
      ------------------------------------------------------------------ */
   SM.formatPrice = (n) => '$' + Number(n).toLocaleString('en-AU');
 
+  /* Google Maps Platform key, used for:
+       - listing photos: Street View Static API, looked up from each listing's lat/lng
+       - nearby shops and cafés on the suburb page: Places API (New), see js/suburb.js
+     Get it from Google Cloud > APIs & Services > Credentials. Leave it empty to turn both off.
+     Restrict the key to your site's address and to those two APIs, because anyone can see it in the page source.
+     Docs: https://developers.google.com/maps/documentation/streetview/request-streetview
+     Images load only when a card scrolls into view (loading="lazy"), so you only pay for what people see. */
+  SM.GOOGLE_MAPS_KEY = 'AIzaSyAaPAgRbPjWBBYLKT-OMO4bOEH_4W2zY6o';
+
+  SM.streetViewURL = function (listing) {
+    if (!SM.GOOGLE_MAPS_KEY || typeof listing.lat !== 'number') return null;
+    return 'https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=80&source=outdoor' +
+      '&return_error_code=true' + // 404 instead of a grey "no imagery" picture, so the placeholder shows
+      '&location=' + listing.lat + ',' + listing.lng + '&key=' + encodeURIComponent(SM.GOOGLE_MAPS_KEY);
+  };
+
+  // Median asking rent and number of listings for one suburb (from data/rentals.js).
+  SM.rentStats = function (slug) {
+    const prices = SM.RENTALS.filter((l) => l.slug === slug).map((l) => l.price).sort((a, b) => a - b);
+    if (!prices.length) return { count: 0, median: null };
+    const mid = Math.floor(prices.length / 2);
+    const median = prices.length % 2 ? prices[mid] : Math.round((prices[mid - 1] + prices[mid]) / 2);
+    return { count: prices.length, median: median };
+  };
+
+  // `suburb` is the scored suburb from data/suburbs.js, or undefined for suburbs we don't score (no fit shown).
   SM.listingCardHTML = function (listing, suburb, isSaved) {
-    const address = listing.street + ', ' + suburb.name + ' QLD ' + suburb.postcode;
-    const fit = (suburb.fit / 10).toFixed(1);
+    const address = listing.street + ', ' + listing.suburb + ' ' + (listing.state || 'QLD') + ' ' + listing.postcode;
+    const fitHTML = suburb
+      ? '<p class="listing__fit" title="How well this suburb fits your priorities">' +
+          '<span class="visually-hidden">Suburb fit </span>' + (suburb.fit / 10).toFixed(1) + SM.icon('smile') + '<span class="visually-hidden"> out of 10</span></p>'
+      : '<p class="listing__fit listing__fit--none" title="We don\'t score this suburb yet">No fit score</p>';
     return (
       '<article class="listing" data-id="' + SM.esc(listing.id) + '">' +
         '<div class="listing__media">' +
-          '<span>Property photo (sample)</span>' +
+          '<span>No photo available</span>' +
+          (SM.streetViewURL(listing)
+            ? '<img src="' + SM.esc(SM.streetViewURL(listing)) + '" alt="Street view near ' + SM.esc(address) + '" loading="lazy" decoding="async" onerror="this.remove()">'
+            : '') +
           '<button class="save-btn" type="button" data-save-listing="' + SM.esc(listing.id) + '" aria-pressed="' + (isSaved ? 'true' : 'false') + '" ' +
             'aria-label="Save listing at ' + SM.esc(address) + '">' + SM.icon('star') + '</button>' +
         '</div>' +
@@ -331,11 +452,11 @@
           '<p class="listing__price">' + SM.formatPrice(listing.price) + '<span>/wk</span></p>' +
           '<span class="pill">' + SM.esc(listing.type) + '</span>' +
         '</div>' +
+        (listing.title ? '<h3 class="listing__title">' + SM.esc(listing.title) + '</h3>' : '') +
         '<div class="listing__row">' +
-          '<p class="listing__addr">' + SM.esc(address) + '</p>' +
-          '<p class="listing__fit" title="How well this suburb fits your priorities">' +
-            '<span class="visually-hidden">Suburb fit </span>' + fit + SM.icon('smile') + '<span class="visually-hidden"> out of 10</span></p>' +
+          '<p class="listing__addr">' + SM.esc(address) + '</p>' + fitHTML +
         '</div>' +
+        (listing.agency ? '<p class="listing__agency">Listed by ' + SM.esc(listing.agency) + '</p>' : '') +
         '<ul class="listing__facts" aria-label="Property features">' +
           '<li>' + SM.icon('bed') + listing.beds + '<span class="visually-hidden"> bedrooms</span></li>' +
           '<li>' + SM.icon('shower') + listing.baths + '<span class="visually-hidden"> bathrooms</span></li>' +

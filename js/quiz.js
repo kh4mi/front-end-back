@@ -41,11 +41,12 @@
         '<li class="rank-item" draggable="true" data-key="' + key + '">' +
           '<span class="rank-item__grip" aria-hidden="true">⠿</span>' +
           '<span class="rank-item__pos" aria-hidden="true"></span>' +
-          '<span class="rank-item__label"><span aria-hidden="true">' + f.emoji + '</span> ' + SM.esc(f.label) + '</span>' +
+          '<span class="rank-item__label">' + SM.esc(f.label) + '</span>' +
           '<div class="rank-item__controls">' +
-            '<fieldset class="rating"><legend class="visually-hidden">How much does ' + SM.esc(f.label) + ' matter? 1 is a little, 5 is a lot.</legend>' +
+            '<fieldset class="rating"><legend class="visually-hidden">How important is ' + SM.esc(f.label) + '? 1 means it doesn\'t matter, 5 means very important.</legend>' +
+              '<span class="rating__end" aria-hidden="true">Doesn\'t matter</span>' +
               '<span class="rating__scale">' + radios + '</span>' +
-              '<span class="rating__hint" aria-hidden="true">1 = a little · 5 = a lot</span>' +
+              '<span class="rating__end" aria-hidden="true">Very important</span>' +
             '</fieldset>' +
             '<span class="rank-item__moves">' +
               '<button type="button" data-move="up" aria-label="Move ' + SM.esc(f.label) + ' up">↑</button>' +

@@ -29,4 +29,4 @@ and GTFS information is used currently to marker the stops.
 
 ## Placeholder data (replace these)
 - `data/suburbs.js`: the `sample` scores for affordability, transport and safety are **made up**. Replace each as its dataset is connected.
-- `data/rentals.js`: made-up listings. To go live, see "Rental listings" below.
+- `data/rentals.js`: real listings from the Kaggle "Australian Rental Market Data 2026" dataset, a 2026 snapshot (not live), all 852 Queensland listings (title, type, weekly rent, address, lat/lng, bed/bath/parking). Only our 20 scored suburbs get a fit score. Rebuild it with `python3 tools/convert-rentals.py path/to/australian_rental_market_2026.json` (keep the CSV out of the uploaded site).

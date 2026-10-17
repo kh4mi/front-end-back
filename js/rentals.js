@@ -9,19 +9,44 @@
   const prefs = data.prefs;
   const params = new URLSearchParams(window.location.search);
 
-  // Fill the suburb dropdown
-  const suburbSelect = $('#fSuburb');
-  data.suburbs.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach(function (s) {
-    const opt = document.createElement('option');
-    opt.value = s.slug;
-    opt.textContent = s.name + ' ' + s.postcode;
-    suburbSelect.appendChild(opt);
+  const PAGE_SIZE = 48; // cards shown at first; "Show more" adds this many again
+  let shownCount = PAGE_SIZE;
+
+  // Every suburb that has listings: slug -> { name, postcode, count }
+  const places = {};
+  SM.RENTALS.forEach(function (l) {
+    if (!places[l.slug]) places[l.slug] = { name: l.suburb, postcode: l.postcode, count: 0 };
+    places[l.slug].count += 1;
   });
+  // Suburbs that share a name (e.g. West End in Townsville) get their postcode added
+  function placeName(slug) {
+    if (data.bySlug[slug]) return data.bySlug[slug].name;
+    const p = places[slug];
+    if (!p) return slug;
+    return p.name + (slug.endsWith('-' + p.postcode) ? ' ' + p.postcode : '');
+  }
+
+  // Fill the suburb dropdown: the suburbs we score first, then every other suburb, only those with listings
+  const suburbSelect = $('#fSuburb');
+  function addGroup(label, slugs) {
+    const group = document.createElement('optgroup');
+    group.label = label;
+    slugs.sort((a, b) => placeName(a).localeCompare(placeName(b))).forEach(function (slug) {
+      const opt = document.createElement('option');
+      const p = places[slug];
+      opt.value = slug;
+      opt.textContent = placeName(slug) + ' ' + (p ? p.postcode + ' (' + p.count + ')' : (data.bySlug[slug].postcode + ' (0)'));
+      group.appendChild(opt);
+    });
+    suburbSelect.appendChild(group);
+  }
+  addGroup('Brisbane City suburbs we score', data.suburbs.map((s) => s.slug).filter((slug) => places[slug]));
+  addGroup('Other Queensland suburbs', Object.keys(places).filter((slug) => !data.bySlug[slug]));
 
   // Starting filters: from the link (?suburb=…&q=…) and from the visitor's quiz answers
   const filters = {
     q: params.get('q') || '',
-    suburb: data.bySlug[params.get('suburb')] ? params.get('suburb') : '',
+    suburb: data.bySlug[params.get('suburb')] || places[params.get('suburb')] ? params.get('suburb') : '',
     beds: prefs ? prefs.beds : 0,
     min: prefs && prefs.budget.min !== null ? prefs.budget.min : null,
     max: prefs && prefs.budget.max !== null ? prefs.budget.max : null,
@@ -44,14 +69,13 @@
   }
 
   function matches(l) {
-    const s = data.bySlug[l.suburb];
-    if (filters.suburb && l.suburb !== filters.suburb) return false;
+    if (filters.suburb && l.slug !== filters.suburb) return false;
     if (filters.beds && l.beds < filters.beds) return false;
     if (filters.min !== null && l.price < filters.min) return false;
     if (filters.max !== null && l.price > filters.max) return false;
     if (filters.savedOnly && SM.getSaved('Listings').indexOf(l.id) < 0) return false;
     if (filters.q) {
-      const hay = (l.street + ' ' + s.name + ' ' + s.postcode + ' ' + l.type).toLowerCase();
+      const hay = (l.title + ' ' + l.street + ' ' + l.suburb + ' ' + l.postcode + ' ' + l.type).toLowerCase();
       if (!filters.q.toLowerCase().split(/\s+/).every((w) => hay.indexOf(w) >= 0)) return false;
     }
     return true;
@@ -59,7 +83,7 @@
 
   function renderChips() {
     const chips = [];
-    if (filters.suburb) chips.push(['suburb', data.bySlug[filters.suburb].name]);
+    if (filters.suburb) chips.push(['suburb', placeName(filters.suburb)]);
     if (filters.beds) chips.push(['beds', filters.beds + '+ beds']);
     if (filters.min !== null || filters.max !== null) {
       const lo = filters.min !== null ? SM.formatPrice(filters.min) : '$0';
@@ -73,23 +97,31 @@
     ).join('');
   }
 
+  // Filters changed: start again from the first page of results
   function render() {
+    shownCount = PAGE_SIZE;
+    draw();
+  }
+
+  function draw() {
     const saved = SM.getSaved('Listings');
     els.savedCount.textContent = saved.length;
 
-    const results = SM.RENTALS.filter(matches).sort(function (a, b) {
-      return data.bySlug[b.suburb].fit - data.bySlug[a.suburb].fit || a.price - b.price;
-    });
+    // Best fit first; suburbs we don't score go after the ones we do
+    const fitOf = (l) => (data.bySlug[l.slug] ? data.bySlug[l.slug].fit : -1);
+    const results = SM.RENTALS.filter(matches).sort((a, b) => fitOf(b) - fitOf(a) || a.price - b.price);
 
     renderChips();
-    const where = filters.suburb ? ' in ' + data.bySlug[filters.suburb].name : '';
+    const where = filters.suburb ? ' in ' + placeName(filters.suburb) : '';
     els.count.textContent = results.length + (results.length === 1 ? ' rental' : ' rentals') + where + (results.length === 1 ? ' matches' : ' match') + ' your filters, sorted by best fit';
 
     if (!results.length) {
       listingsEl.innerHTML = '<div class="empty-state"><p><strong>No rentals match these filters.</strong></p><p>Try a wider price range or fewer bedrooms.</p><button class="btn" type="button" id="emptyClear">Clear filters</button></div>';
       return;
     }
-    listingsEl.innerHTML = results.map((l) => SM.listingCardHTML(l, data.bySlug[l.suburb], saved.indexOf(l.id) >= 0)).join('');
+    const more = results.length - shownCount;
+    listingsEl.innerHTML = results.slice(0, shownCount).map((l) => SM.listingCardHTML(l, data.bySlug[l.slug], saved.indexOf(l.id) >= 0)).join('') +
+      (more > 0 ? '<div class="listing-more"><button class="btn btn-lg" type="button" id="showMore">Show ' + Math.min(more, PAGE_SIZE) + ' more of ' + more + '</button></div>' : '');
   }
 
   function readInputs() {
@@ -110,7 +142,17 @@
   // Events
   [suburbSelect, els.beds, els.min, els.max].forEach((el) => el.addEventListener('change', readInputs));
   $('#clearFilters').addEventListener('click', clearAll);
-  listingsEl.addEventListener('click', function (e) { if (e.target.id === 'emptyClear') clearAll(); });
+  listingsEl.addEventListener('click', function (e) {
+    if (e.target.id === 'emptyClear') clearAll();
+    if (e.target.id === 'showMore') {
+      const firstNew = shownCount;
+      shownCount += PAGE_SIZE;
+      draw();
+      // Move focus to the first new card so keyboard users carry on from where they were
+      const card = listingsEl.querySelectorAll('.listing')[firstNew];
+      if (card) { card.setAttribute('tabindex', '-1'); card.focus(); }
+    }
+  });
   $('#searchForm').addEventListener('submit', function (e) { e.preventDefault(); filters.q = els.q.value.trim(); render(); });
   els.edit.addEventListener('click', function () {
     const open = els.panel.hidden;
@@ -137,7 +179,7 @@
   SM.bindSaveButtons(listingsEl, function () {
     // Saving changes the count; if we're showing "saved only", removing a star removes the card.
     els.savedCount.textContent = SM.getSaved('Listings').length;
-    if (filters.savedOnly) render();
+    if (filters.savedOnly) draw();
   });
 
   syncInputs();

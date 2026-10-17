@@ -50,31 +50,56 @@
 
         <h2>Nearby amenities</h2>
         <ul class="chips" id="amenities"></ul>
-        <p class="muted" id="amenityNote" style="margin-top:.75rem"></p>
+        <div class="nearby">
+          <section class="nearby__group" aria-labelledby="nearTransportHead">
+            <h3 id="nearTransportHead">Trains, ferries and buses</h3>
+            <ul class="nearby__list" id="nearTransport"><li class="muted">Loading Translink stops…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearMallsHead">
+            <h3 id="nearMallsHead">Shopping centres</h3>
+            <ul class="nearby__list" id="nearMalls"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearShopsHead">
+            <h3 id="nearShopsHead">Supermarkets</h3>
+            <ul class="nearby__list" id="nearShops"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearCafesHead">
+            <h3 id="nearCafesHead">Cafés</h3>
+            <ul class="nearby__list" id="nearCafes"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group nearby__group--wide" aria-labelledby="nearParksHead">
+            <h3 id="nearParksHead">Parks</h3>
+            <ul class="nearby__list nearby__list--cols" id="nearParks"></ul>
+          </section>
+        </div>
+        <p class="muted nearby__note" id="amenityNote"></p>
 
-        <div id="dataNotes"></div>
       </section>
 
       <aside aria-label="Suburb facts">
+        <a class="btn btn-primary btn-block btn-lg" id="rentalsLink" href="rentals.html" style="margin-bottom:1.25rem">View rentals <span aria-hidden="true">→</span></a>
         <section class="panel">
           <h2>Community Snapshot</h2>
           <dl>
-            <dt>Population</dt><dd>Not connected yet</dd>
-            <dt>Median age</dt><dd>Not connected yet</dd>
-            <dt>Demographic</dt><dd>Not connected yet</dd>
-            <dt>Common household type</dt><dd>Not connected yet</dd>
+            <dt>Population</dt><dd id="cPopulation">Loading…</dd>
+            <dt>Median age</dt><dd id="cMedianAge">Loading…</dd>
+            <dt>Largest age group</dt><dd id="cAgeGroup">Loading…</dd>
+            <dt>Born overseas</dt><dd id="cOverseas">Loading…</dd>
+            <dt>Average household size</dt><dd id="cHousehold">Loading…</dd>
+            <dt>Median household income</dt><dd id="cIncome">Loading…</dd>
           </dl>
-          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Planned source: ABS Census.</p>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Source: ABS 2021 Census (General Community Profile, tables G01 and G02).</p>
         </section>
         <section class="panel">
           <h2>Housing Costs</h2>
           <dl>
-            <dt>Median weekly rent</dt><dd>Not connected yet</dd>
-            <dt>Data updated</dt><dd>Not connected yet</dd>
+            <dt>Median rent (2021 Census)</dt><dd id="censusRent">Loading…</dd>
+            <dt>Median mortgage repayment</dt><dd id="censusMortgage">Loading…</dd>
+            <dt>Median asking rent (2026 listings)</dt><dd id="medianRent">Loading…</dd>
+            <dt>Listings in this suburb</dt><dd id="rentCount">Loading…</dd>
           </dl>
-          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Planned source: ABS Census housing costs.</p>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Sources: ABS 2021 Census (rent and mortgage medians, used for the Affordability score) and a 2026 snapshot of rental listings (Kaggle) for asking rents. Rental listings show as red pins on the map.</p>
         </section>
-        <a class="btn btn-primary btn-block btn-lg" id="rentalsLink" href="rentals.html">View rentals <span aria-hidden="true">→</span></a>
       </aside>
     </div>
   </main>

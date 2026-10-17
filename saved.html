@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Saved – Suburb.ly</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/saved.js" defer></script>
+</head>
+<body>
+  <site-header active="saved"></site-header>
+
+  <main id="main" class="container saved">
+    <h1>Saved</h1>
+    <p class="muted" id="savedWho">Everything you star is kept here, in this browser.</p>
+
+    <section aria-labelledby="savedSuburbsHeading">
+      <h2 id="savedSuburbsHeading">Saved suburbs <span class="saved__count" id="suburbCount"></span></h2>
+      <ul class="saved-list" id="savedSuburbList"></ul>
+    </section>
+
+    <section aria-labelledby="savedListingsHeading">
+      <h2 id="savedListingsHeading">Saved listings <span class="saved__count" id="listingCount"></span></h2>
+      <div class="listing-grid" id="savedListingGrid"></div>
+    </section>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

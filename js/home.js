@@ -5,8 +5,11 @@
 
   function render(bySlug) {
     const saved = SM.getSaved('Listings');
-    track.innerHTML = SM.RENTALS.slice(0, 8)
-      .map((l) => SM.listingCardHTML(l, bySlug[l.suburb], saved.indexOf(l.id) >= 0))
+    // Show listings from the suburbs we score, best fit first
+    track.innerHTML = SM.RENTALS.filter((l) => bySlug[l.slug])
+      .sort((a, b) => bySlug[b.slug].fit - bySlug[a.slug].fit || a.price - b.price)
+      .slice(0, 8)
+      .map((l) => SM.listingCardHTML(l, bySlug[l.slug], saved.indexOf(l.id) >= 0))
       .join('');
     // role="list" needs role="listitem" children
     track.querySelectorAll('.listing').forEach((el) => el.setAttribute('role', 'listitem'));

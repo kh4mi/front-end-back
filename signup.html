@@ -26,7 +26,8 @@
         </div>
         <div class="field">
           <label for="email">Email</label>
-          <input id="email" type="email" autocomplete="email" required>
+          <input id="email" type="text" inputmode="email" autocomplete="email" required aria-describedby="emailError">
+          <p class="field-error" id="emailError" role="alert" hidden></p>
         </div>
         <div class="field">
           <label for="password">Password</label>
@@ -38,7 +39,13 @@
         </label>
         <button class="btn btn-primary btn-block btn-lg" type="submit" id="submitBtn">Create Account</button>
       </form>
-      <p class="auth-note">Prototype only: no account is created, and nothing you type here is sent or stored.</p>
+      <p class="field-error" id="authError" role="alert" hidden></p>
+      <div class="auth-demo">
+        <p class="auth-demo__or"><span>or</span></p>
+        <button class="btn btn-block" type="button" id="demoBtn">Try with a demo account</button>
+        <p class="auth-demo__hint">Logs you in as "Demo User" so you can look around without signing up.</p>
+      </div>
+      <p class="auth-note">Demo accounts for this prototype: your account is saved only in this browser and is never sent anywhere. Don't use a real password.</p>
     </div>
   </main>
 

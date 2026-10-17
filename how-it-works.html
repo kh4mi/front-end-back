@@ -26,7 +26,7 @@
       </li>
       <li>
         <h3>We score every suburb</h3>
-        <p>Each suburb gets a 1 to 10 score for each factor, based on public data. Some scores are still sample values while datasets are connected (see below).</p>
+        <p>Each of the 180 Brisbane City Council suburbs gets a 1 to 10 score for each factor, based on public data. Scores are ranks: 10 means the best of the 180, not a perfect suburb. If a suburb has no data for a factor (for example, no rental listings), it shows "No data" and counts as an average 5.</p>
       </li>
       <li>
         <h3>Weighted match %</h3>
@@ -43,10 +43,11 @@
     <p>Each source is government-published and updates on its own schedule, from live feeds to five-year cycles. We'll show the date next to each figure once these are connected.</p>
     <ul class="source-list">
       <li><span><strong>Brisbane City Council</strong> – Parks &amp; Green Space</span><span class="status status--live">Live</span></li>
-      <li><span><strong>ABS Census</strong> – Housing Costs</span><span class="status status--planned">Sample values for now</span></li>
-      <li><span><strong>SEIFA</strong> – Socio-Economic Index</span><span class="status status--planned">Sample values for now</span></li>
-      <li><span><strong>Translink SEQ GTFS</strong> – Transport</span><span class="status status--live">Live, using specific files from API</span></li>
-      <li><span><strong>QPS</strong> – Safety statistics</span><span class="status status--planned">Sample values for now</span></li>
+      <li><span><strong>ABS Census</strong> – Median rent (Affordability score), population, age, household size and income</span><span class="status status--live">2021 Census</span></li>
+      <li><span><strong>SEIFA</strong> – Socio-Economic Index</span><span class="status status--planned">Planned</span></li>
+      <li><span><strong>Translink SEQ GTFS</strong> – Transport (bus stops per km², train stations, ferry terminals)</span><span class="status status--live">Live, using specific files from API</span></li>
+      <li><span><strong>Kaggle</strong> – Australian Rental Market Data 2026 (rental listings and median asking rent)</span><span class="status status--live">2026 snapshot</span></li>
+      <li><span><strong>QPS</strong> – Reported offence rates by police division (Safety score)</span><span class="status status--live">Latest 12 months, Sep 2025 to Aug 2026</span></li>
     </ul>
 
     <h2 id="privacy">What we collect and why</h2>
@@ -54,6 +55,7 @@
       <li>Your quiz answers (priorities and weights) are used only to generate your suburb matches.</li>
       <li>In this prototype they are stored only in your own browser. They are not sent to a server, sold, or shared with landlords, agents or advertisers.</li>
       <li>Saved suburbs and saved listings are stored in your browser so you can return to your results.</li>
+      <li>Demo accounts (sign up and log in) are also saved only in this browser. Passwords are stored as a hash, not as typed, but this is a prototype, so don't use a real password.</li>
       <li>You can delete everything at any time using the button below.</li>
     </ul>
 
