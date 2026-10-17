@@ -1,32 +1,90 @@
-# SiteName (DECO1800 Work-in-Progress)
+# suburb.ly (DECO1800 work in progress)
 
-A static website: no build step, no server needed. Open `index.html` in a browser, or upload the whole folder to your team zone.
+suburb.ly helps people new to Brisbane choose a suburb that fits their life before they start looking for a rental. Visitors rank what matters to them (affordability, transport, safety, parks) and the site scores all 180 Brisbane City Council suburbs against those priorities.
+
+It is a static website: there is no build step and no back end. Saved items and demo accounts live in the visitor's browser (localStorage).
+
+## Running it locally
+Some pages read data files with `fetch()`, which browsers block when a page is opened straight from disk (`file://`). Serve the folder instead, using either of these:
+
+- **VS Code**: install the Live Server extension, then right-click `index.html` and choose "Open with Live Server". It opens at http://127.0.0.1:5500.
+- **Terminal**, from this folder: run `python3 -m http.server 8000`, then open http://localhost:8000.
+
+To publish, upload the whole folder (for example, to your team zone). The `tools/` folder isn't needed by the website.
 
 ## Pages
 | File | What it is |
 |---|---|
-| `index.html` | Landing page, search box, sample rentals carousel |
-| `quiz.html` | 5-question matching quiz (saves answers in the browser) |
-| `results.html` | Ranked suburbs + Leaflet map |
-| `suburbSummary.html?s=toowong` | Suburb detail page |
-| `rentals.html` | Find a rental (sample listings, filters, saved) |
-| `how-it-works.html` | Scoring explanation, data sources, privacy + consent |
-| `signup.html` | Sign up / log in form (front end only) |
-| `under-construction.html` | The 404 page from the Figma |
-| `references.html` | Credits for all outside sources |
+| `index.html` | Home: looping video hero, search, and a carousel of rentals in the best-fit suburbs |
+| `quiz.html` | 5-question matching quiz (answers saved in the browser) |
+| `results.html` | Browse suburbs: ranked suburbs, your saved suburbs, and a Leaflet map |
+| `suburbSummary.html?s=toowong` | Suburb page: scores, map with pins and a map key, nearby places, census snapshot, housing costs, Save Suburb |
+| `rentals.html` | Find a rental: Kaggle listings with filters and saving |
+| `saved.html` | Saved suburbs and saved listings |
+| `signup.html` | Demo sign up and log in, plus a "Try with a demo account" button |
+| `how-it-works.html` | How scoring works, data sources, privacy, and a delete-my-data button |
+| `references.html` | Credits for every outside source |
+| `under-construction.html` | Placeholder (404) page |
 
-## Reusable parts
-- **`css/theme.css`**: colours, font, buttons, cards, chips, score bars. Change the variables in `:root` to re-skin everything.
-- **`css/pages.css`**: layouts for each page.
-- **`js/components.js`**: the navbar and footer, written once. Every page uses `<site-header active="browse"></site-header>` and `<site-footer></site-footer>`. Change `SITE_NAME` at the top of this file when you pick a real name.
-- **`js/app.js`**: shared logic (saved data, parks API, matching, listing cards).
+## Code layout
+- **`css/theme.css`**: colours, font, buttons, cards, chips and score bars. Change the variables in `:root` to re-skin the whole site. The page background is `--c-bg` (#FAFAFA) and the navbar is `--c-nav` (#EEE5D7).
+- **`css/pages.css`**: page layouts, the hero video, map pins and the map key.
+- **`js/components.js`**: the navbar and footer, written once and used on every page as `<site-header active="browse"></site-header>` and `<site-footer></site-footer>`. The navbar shows "Hi, name" and Log out when someone is signed in.
+- **`js/app.js`**: shared logic, including:
+  - saved data (`SM.store`, kept separately for each account)
+  - the live parks API
+  - matching and fit scores
+  - listing cards
+  - the Google key
+- **`js/suburb.js`**: the suburb page, covering the map layers and key, nearby places and the census panels.
+- **`js/signup.js`**: demo accounts. Passwords are stored only as a SHA-256 hash, in the browser. This is a prototype, so don't use real passwords.
+- **`js/hero-video.js`**: the homepage video loop. The text appears after 2 seconds, or straight away if the visitor has reduced motion turned on.
 
-## Live data
-`js/app.js` calls the Brisbane City Council "Park – Locations" dataset. It looks at the first record to find the real field names, downloads every park, counts parks per suburb, and turns the counts into the Parks & Rec score.
-`js/suburb.js` calls the Brisbane City Council "Suburb Boundaries" dataset AND static SEQ GTFS information (data/___.txt files).
-BCC dataset uses geoshape of suburb to show the clear suburb lines,
-and GTFS information is used currently to marker the stops.
+## Data
+| Data | Where it comes from | Live or snapshot |
+|---|---|---|
+| Suburbs, transport, safety and affordability scores, census figures | `data/suburbs.js`, generated by `tools/build-suburbs.py` | Snapshot |
+| Rental listings | `data/rentals.js`, generated by `tools/convert-rentals.py` from Kaggle "Australian Rental Market Data 2026" | Snapshot (2026) |
+| Parks score and park names | Brisbane City Council "Park – Locations" API, cached in the browser | Live |
+| Suburb boundary on the map | Brisbane City Council "Suburb Boundaries" API | Live |
+| Bus stops, train stations, ferry terminals | Translink SEQ GTFS (`data/stops.txt`, `data/routes.txt`) | Snapshot |
+| Shopping centres, supermarkets, cafés | Google Places API (New), cached for 7 days in the browser | Live |
+| Listing photos | Google Street View Static API | Live |
+| Map tiles | Mapbox (suburb page) and OpenStreetMap (Browse suburbs) | Live |
 
-## Placeholder data (replace these)
-- `data/suburbs.js`: the `sample` scores for affordability, transport and safety are **made up**. Replace each as its dataset is connected.
-- `data/rentals.js`: real listings from the Kaggle "Australian Rental Market Data 2026" dataset, a 2026 snapshot (not live), all 852 Queensland listings (title, type, weekly rent, address, lat/lng, bed/bath/parking). Only our 20 scored suburbs get a fit score. Rebuild it with `python3 tools/convert-rentals.py path/to/australian_rental_market_2026.json` (keep the CSV out of the uploaded site).
+### How the scores work
+Every score is 1 to 10 and ranks a suburb against the other 179. A 10 means the best of the list, not a perfect suburb.
+
+- **Transport**: Translink bus stops per km² inside the suburb, plus 2 for a train station and 1 for a ferry terminal in the suburb or within 1 km of its centre.
+- **Safety**: Queensland Police reported offences against people and property per 100,000 residents over the latest 12 months, for the police division the suburb's centre falls in.
+- **Affordability**: the ABS 2021 Census median weekly rent, where the cheapest suburb scores 10. Lytton and Eagle Farm have almost no residents, so they show "No data".
+- **Parks**: the number of parks in the suburb, from the live Council data.
+
+A suburb with no data for a factor shows "No data" and counts as average in its fit score. If a factor has no data anywhere (for example, the parks API is down), it is left out of the match.
+
+### Rebuilding the data
+Run these from this folder:
+
+```
+python3 tools/build-suburbs.py
+python3 tools/convert-rentals.py path/to/australian_rental_market_2026.json
+```
+
+`build-suburbs.py` rewrites `data/suburbs.js`. The first time it runs, it downloads its sources (suburb boundaries, postcodes, QPS crime rates and police divisions) into `tools/.cache/`, which git ignores. It also reads the ABS Census files in `tools/census/`:
+- G01 and G02 from the 2021 General Community Profile DataPack (Suburbs and Localities, Queensland)
+- `sal-names-qld.csv`, which matches each census code to a suburb name
+
+`convert-rentals.py` rewrites `data/rentals.js`. You only need to re-run it if the suburb list changes or you download a newer Kaggle file. Keep the Kaggle download out of the uploaded site.
+
+## Google Maps key
+The key is `SM.GOOGLE_MAPS_KEY` in `js/app.js`. It is used for the Places API (New) and the Street View Static API. Anyone can read it in the page source, so restrict it in Google Cloud Console under APIs & Services > Credentials:
+
+1. Under Application restrictions, choose **Websites** and add the addresses the site runs from, for example `http://127.0.0.1:5500/*`, `http://localhost:8000/*` and your team zone address.
+2. Under API restrictions, choose **Restrict key** and tick only **Places API (New)** and **Street View Static API**.
+
+If you set the key to an empty string, listing photos and nearby places turn off and the rest of the site still works.
+
+## Known limits
+- The rental listings and census figures are snapshots, so some listings may already be leased, and census rents are from 2021.
+- Accounts and saved items exist only in the browser they were made in.
+- Safety is measured per police division, so suburbs in the same division share a score.
