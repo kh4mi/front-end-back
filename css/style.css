@@ -9,10 +9,19 @@
 	line-height: 1.2;
 }
 
-.suburb-page h1 { font-size: var(--text-h1); font-weight: 700; }
-.suburb-page h2 { font-size: var(--text-sub); font-weight: 700; }
+.suburb-page h1 {
+	font-size: var(--text-h1);
+	font-weight: 700;
+}
 
-.suburb-page [hidden] { display: none !important; }
+.suburb-page h2 {
+	font-size: var(--text-sub);
+	font-weight: 700;
+}
+
+.suburb-page [hidden] {
+	display: none !important;
+}
 
 .container {
 	width: 100%;
@@ -75,8 +84,13 @@
 	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.btn:hover { background: var(--color-yellow); }
-.btn[aria-pressed="true"] { background: var(--color-yellow); }
+.btn:hover {
+	background: var(--color-yellow);
+}
+
+.btn[aria-pressed="true"] {
+	background: var(--color-yellow);
+}
 
 .btn--primary {
 	width: 100%;
@@ -94,7 +108,8 @@
 /* Map hero (collapsed preview -> expanded on click) ------------------------ */
 .hero-map {
 	position: relative;
-	isolation: isolate;               /* keeps Leaflet's z-indexes inside this box */
+	isolation: isolate;
+	/* keeps Leaflet's z-indexes inside this box */
 	height: clamp(14rem, 30vw, 20rem);
 	background: var(--color-track);
 	overflow: hidden;
@@ -158,7 +173,9 @@
 	align-items: start;
 }
 
-.suburb__title { margin-bottom: var(--space-2); }
+.suburb__title {
+	margin-bottom: var(--space-2);
+}
 
 .suburb__meta {
 	display: flex;
@@ -169,7 +186,7 @@
 	overflow: visible;
 }
 
-.suburb__meta li + li::before {
+.suburb__meta li+li::before {
 	content: "";
 	display: inline-block;
 	width: 4px;
@@ -209,7 +226,8 @@
 }
 
 .score__bar {
-	--score: 0;                       /* set inline, 0–10 */
+	--score: 0;
+	/* set inline, 0–10 */
 	height: 0.75rem;
 	background: var(--color-track);
 }
@@ -229,7 +247,9 @@
 }
 
 /* Amenities */
-.amenities__title { margin-bottom: var(--space-3); }
+.amenities__title {
+	margin-bottom: var(--space-3);
+}
 
 .amenities__list {
 	flex-wrap: wrap;
@@ -255,7 +275,9 @@
 	border: var(--border);
 }
 
-.card__title { margin-bottom: var(--space-3); }
+.card__title {
+	margin-bottom: var(--space-3);
+}
 
 .facts {
 	display: grid;
@@ -273,8 +295,13 @@
 	font-size: var(--text-small);
 }
 
-.facts dt::after { content: ":"; }
-.facts dd { min-height: 1.55em; }
+.facts dt::after {
+	content: ":";
+}
+
+.facts dd {
+	min-height: 1.55em;
+}
 
 /* Responsive */
 @media (max-width: 60rem) {
@@ -299,11 +326,20 @@
 		row-gap: var(--space-1);
 	}
 
-	.score__bar { grid-column: 1 / -1; grid-row: 2; }
+	.score__bar {
+		grid-column: 1 / -1;
+		grid-row: 2;
+	}
 
-	.hero-map.is-expanded { height: 75vh; }
+	.hero-map.is-expanded {
+		height: 75vh;
+	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.hero-map, .btn { transition: none; }
+
+	.hero-map,
+	.btn {
+		transition: none;
+	}
 }

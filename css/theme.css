@@ -407,6 +407,7 @@ site-header {
 
 .site-footer a {
   color: #fff;
+  text-decoration: none;
 }
 
 .site-footer a:hover {
