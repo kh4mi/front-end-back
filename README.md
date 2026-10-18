@@ -1,16 +1,8 @@
-# suburb.ly (DECO1800 work in progress)
+# suburb.ly (DECO1800 front end back)
 
 suburb.ly helps people new to Brisbane choose a suburb that fits their life before they start looking for a rental. Visitors rank what matters to them (affordability, transport, safety, parks) and the site scores all 180 Brisbane City Council suburbs against those priorities.
 
-It is a static website: there is no build step and no back end. Saved items and demo accounts live in the visitor's browser (localStorage).
-
-## Running it locally
-Some pages read data files with `fetch()`, which browsers block when a page is opened straight from disk (`file://`). Serve the folder instead, using either of these:
-
-- **VS Code**: install the Live Server extension, then right-click `index.html` and choose "Open with Live Server". It opens at http://127.0.0.1:5500.
-- **Terminal**, from this folder: run `python3 -m http.server 8000`, then open http://localhost:8000.
-
-To publish, upload the whole folder (for example, to your team zone). The `tools/` folder isn't needed by the website.
+It is currently a static website: there is no build step and no back end. Saved items and demo accounts live in the visitor's browser (localStorage).
 
 ## Pages
 | File | What it is |
@@ -62,14 +54,6 @@ Every score is 1 to 10 and ranks a suburb against the other 179. A 10 means the 
 
 A suburb with no data for a factor shows "No data" and counts as average in its fit score. If a factor has no data anywhere (for example, the parks API is down), it is left out of the match.
 
-### Rebuilding the data
-Run these from this folder:
-
-```
-python3 tools/build-suburbs.py
-python3 tools/convert-rentals.py path/to/australian_rental_market_2026.json
-```
-
 `build-suburbs.py` rewrites `data/suburbs.js`. The first time it runs, it downloads its sources (suburb boundaries, postcodes, QPS crime rates and police divisions) into `tools/.cache/`, which git ignores. It also reads the ABS Census files in `tools/census/`:
 - G01 and G02 from the 2021 General Community Profile DataPack (Suburbs and Localities, Queensland)
 - `sal-names-qld.csv`, which matches each census code to a suburb name
@@ -77,7 +61,7 @@ python3 tools/convert-rentals.py path/to/australian_rental_market_2026.json
 `convert-rentals.py` rewrites `data/rentals.js`. You only need to re-run it if the suburb list changes or you download a newer Kaggle file. Keep the Kaggle download out of the uploaded site.
 
 ## Google Maps key
-The key is `SM.GOOGLE_MAPS_KEY` in `js/app.js`. It is used for the Places API (New) and the Street View Static API. Anyone can read it in the page source, so restrict it in Google Cloud Console under APIs & Services > Credentials:
+The key is `SM.GOOGLE_MAPS_KEY` in `js/app.js`. It is used for the Places API (New) and the Street View Static API.
 
 1. Under Application restrictions, choose **Websites** and add the addresses the site runs from, for example `http://127.0.0.1:5500/*`, `http://localhost:8000/*` and your team zone address.
 2. Under API restrictions, choose **Restrict key** and tick only **Places API (New)** and **Street View Static API**.
