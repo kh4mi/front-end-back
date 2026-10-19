@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>About – Suburb.ly</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <script src="data/suburbs.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+</head>
+<body>
+  <site-header active="about"></site-header>
+
+  <main id="main" class="container how about">
+    <h1>About Suburb.ly</h1>
+    <p class="lead" style="margin-inline:0">Suburb.ly helps people who are new to Brisbane choose a suburb that fits their life before they start hunting for a rental.</p>
+
+    <h2 style="margin-top:2.5rem">Why we built it</h2>
+    <p>Students, skilled migrants and people moving interstate often have to sign a lease before they know the city. Rental sites show properties, not neighbourhoods, so newcomers end up choosing on price and photos alone and only find out about the commute, the parks or how safe the area feels after they have moved in.</p>
+    <p>Suburb.ly flips the order. You tell us what matters to you (affordability, transport, safety, parks), we rank 474 Queensland suburbs (every Brisbane City Council suburb, plus every other Queensland suburb with a rental listing) against your priorities using public data, and only then show rentals in the suburbs that fit.</p>
+
+    <h2>The team</h2>
+    <p>We are the front end back team, students in DECO1800 at the University of Queensland.</p>
+    <ul class="team">
+      <li class="team__member">
+        <span class="team__photo" aria-hidden="true">AY<img src="images/team/abhi-yadav.jpg" alt="" onerror="this.remove()"></span>
+        <strong>Abhi Yadav</strong><span class="team__role">Head of Research and Quality Assurance</span>
+      </li>
+      <li class="team__member">
+        <span class="team__photo" aria-hidden="true">NM<img src="images/team/natalie-mitchell.jpg" alt="" onerror="this.remove()"></span>
+        <strong>Natalie Mitchell</strong><span class="team__role">Head of Brand and Presentation</span>
+      </li>
+      <li class="team__member">
+        <span class="team__photo" aria-hidden="true">NB<img src="images/team/nataley-bramwell.jpg" alt="" onerror="this.remove()"></span>
+        <strong>Nataley Bramwell</strong><span class="team__role">Head of UX/UI Design</span>
+      </li>
+      <li class="team__member">
+        <span class="team__photo" aria-hidden="true">NL<img src="images/team/natasha-lim.jpg" alt="" onerror="this.remove()"></span>
+        <strong>Natasha Lim</strong><span class="team__role">Head of Website Implementation</span>
+      </li>
+      <li class="team__member">
+        <span class="team__photo" aria-hidden="true">SM<img src="images/team/shanelle-milan.jpg" alt="" onerror="this.remove()"></span>
+        <strong>Shanelle Milan</strong><span class="team__role">Head of User Testing and Delivery</span>
+      </li>
+    </ul>
+
+    <h2>Our standpoints</h2>
+    <ul>
+      <li><strong>You decide what "good" means.</strong> We don't call any suburb good or bad. Scores are ranks between the suburbs we cover, and only your priorities decide the order.</li>
+      <li><strong>People are not a score.</strong> The Community Snapshot shows census facts such as age and where residents were born, so you know what a suburb is like. We never use these facts to rank suburbs, because who lives somewhere is not a measure of whether it is a good place to live.</li>
+      <li><strong>Missing data is neutral.</strong> When a suburb has no data for a factor, it counts as average (5 out of 10) rather than being pushed to the bottom, so a gap in the data doesn't punish a suburb.</li>
+      <li><strong>Plain language first.</strong> We explain every score in everyday words and show where the numbers come from, because many of our users are new to Australia and to its rental system.</li>
+    </ul>
+
+    <h2>Assumptions we made about the data</h2>
+    <ul>
+      <li><strong>Safety.</strong> We use Queensland Police reported offences against people and property per 100,000 residents over the latest 12 months. Police publish these by police division, not by suburb, so every suburb in a division shares its score. Reported offences are not the same as all crime: some crime goes unreported, and busy shopping and nightlife areas such as the CBD and Fortitude Valley record offences against visitors as well as residents. We left out drug and traffic offences because they mostly reflect where police patrol.</li>
+      <li><strong>Affordability.</strong> We use the median weekly rent from the ABS 2021 Census, because it covers almost every suburb in the same way. Rents have risen since 2021, so treat the dollar figures as a comparison between suburbs, not today's price. Suburbs with fewer than 100 residents (Lytton and Eagle Farm) show "No data", because a median of a handful of homes says nothing about the suburb.</li>
+      <li><strong>Transport.</strong> We count Translink bus stops per km² inside each suburb and add points for a train station or ferry terminal in or within 1 km of the suburb. This measures access to stops, not how often services run or how long a trip takes. Translink's data only covers South East Queensland, so towns beyond it (for example Mount Isa or Moranbah) show "No data" for transport.</li>
+      <li><strong>Parks.</strong> We count the parks Brisbane City Council lists in each suburb. A small pocket park counts the same as a large reserve. The Council's list only covers its own suburbs, so suburbs outside Brisbane City show "No data" for parks.</li>
+      <li><strong>Distances</strong> are straight lines from the centre of the suburb, not travel times.</li>
+      <li><strong>Boundaries.</strong> Suburb centres and areas come from the 2017 Queensland locality boundaries, which can differ slightly from the Council's current suburb boundaries. A few newer localities (such as Banya and Kirra) aren't in the 2017 boundaries, so they borrow the boundary of the locality their listings sit in, and have no census figures.</li>
+      <li><strong>Census figures</strong> are from 2021. The ABS slightly adjusts small counts to protect privacy, so very small numbers may be a little off.</li>
+    </ul>
+
+    <h2>Disclaimers</h2>
+    <ul>
+      <li>Suburb.ly is a student prototype made for a university course. It is a guide to help you shortlist suburbs, not financial, legal or real estate advice.</li>
+      <li>Rental listings come from a 2026 snapshot (a Kaggle dataset), not a live feed, so a listing may already be leased. Always check with the agent before you make a decision.</li>
+      <li>Listing photos are Google Street View images of the street at the listed address, not photos supplied with the listing.</li>
+      <li>We are not affiliated with Brisbane City Council, the Queensland Police Service, the Australian Bureau of Statistics, Translink, Google or any real estate agency. Their data is used under their published licences (see <a href="references.html">References and credits</a>).</li>
+      <li>Your quiz answers, saved items and demo accounts stay in your own browser and are never sent to a server. See <a href="how-it-works.html#privacy">Privacy and your data</a>.</li>
+    </ul>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

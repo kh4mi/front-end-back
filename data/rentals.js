@@ -2,8 +2,8 @@
    RENTAL LISTINGS (generated, do not edit by hand)
    Source: "Australian Rental Market Data 2026" by kanchana1990 on Kaggle
    https://www.kaggle.com/datasets/kanchana1990/australian-rental-market-data-2026
-   A one-off snapshot, not live. Region: qld.
-   Rebuild with: python3 tools/convert-rentals.py <dataset.json> --region qld
+   A one-off snapshot, not live. Region: rated.
+   Rebuild with: python3 tools/convert-rentals.py <dataset.json> --region rated
    Fields: price = $ per week; slug matches data/suburbs.js for the suburbs we score.
    ========================================================================== */
 window.SM = window.SM || {};

@@ -40,12 +40,14 @@
     });
     suburbSelect.appendChild(group);
   }
-  addGroup('Brisbane City suburbs we score', data.suburbs.map((s) => s.slug).filter((slug) => places[slug]));
-  addGroup('Other Queensland suburbs', Object.keys(places).filter((slug) => !data.bySlug[slug]));
+  const isBcc = (slug) => !!(data.bySlug[slug] && data.bySlug[slug].bcc);
+  addGroup('Brisbane City suburbs', Object.keys(places).filter(isBcc));
+  addGroup('Other Queensland suburbs', Object.keys(places).filter((slug) => !isBcc(slug)));
 
   // Starting filters: from the link (?suburb=…&q=…) and from the visitor's quiz answers
   const filters = {
     q: params.get('q') || '',
+    area: SM.getArea(),
     suburb: data.bySlug[params.get('suburb')] || places[params.get('suburb')] ? params.get('suburb') : '',
     beds: prefs ? prefs.beds : 0,
     min: prefs && prefs.budget.min !== null ? prefs.budget.min : null,
@@ -54,7 +56,7 @@
   };
 
   const els = {
-    q: $('#q'), beds: $('#fBeds'), min: $('#fMin'), max: $('#fMax'),
+    q: $('#q'), area: $('#fArea'), beds: $('#fBeds'), min: $('#fMin'), max: $('#fMax'),
     savedBtn: $('#savedBtn'), savedCount: $('#savedCount'),
     chips: $('#filterChips'), count: $('#resultCount'),
     panel: $('#filterPanel'), edit: $('#editFilters')
@@ -62,14 +64,19 @@
 
   function syncInputs() {
     els.q.value = filters.q;
+    els.area.value = filters.area;
     suburbSelect.value = filters.suburb;
     els.beds.value = String(filters.beds || 0);
     els.min.value = filters.min === null ? '' : filters.min;
     els.max.value = filters.max === null ? '' : filters.max;
   }
 
+  // The area only narrows a general browse: picking a suburb or searching by name finds it anywhere in Queensland
+  const areaApplies = () => !filters.suburb && !filters.q;
+
   function matches(l) {
     if (filters.suburb && l.slug !== filters.suburb) return false;
+    if (areaApplies() && !SM.inArea(data.bySlug[l.slug], filters.area)) return false;
     if (filters.beds && l.beds < filters.beds) return false;
     if (filters.min !== null && l.price < filters.min) return false;
     if (filters.max !== null && l.price > filters.max) return false;
@@ -112,7 +119,7 @@
     const results = SM.RENTALS.filter(matches).sort((a, b) => fitOf(b) - fitOf(a) || a.price - b.price);
 
     renderChips();
-    const where = filters.suburb ? ' in ' + placeName(filters.suburb) : '';
+    const where = filters.suburb ? ' in ' + placeName(filters.suburb) : areaApplies() && filters.area === 'brisbane' ? ' in Brisbane City' : '';
     els.count.textContent = results.length + (results.length === 1 ? ' rental' : ' rentals') + where + (results.length === 1 ? ' matches' : ' match') + ' your filters, sorted by best fit';
 
     if (!results.length) {
@@ -126,6 +133,8 @@
 
   function readInputs() {
     filters.suburb = suburbSelect.value;
+    filters.area = els.area.value;
+    SM.setArea(filters.area);
     filters.beds = Number(els.beds.value);
     filters.min = els.min.value === '' ? null : Number(els.min.value);
     filters.max = els.max.value === '' ? null : Number(els.max.value);
@@ -140,7 +149,7 @@
   }
 
   // Events
-  [suburbSelect, els.beds, els.min, els.max].forEach((el) => el.addEventListener('change', readInputs));
+  [suburbSelect, els.area, els.beds, els.min, els.max].forEach((el) => el.addEventListener('change', readInputs));
   $('#clearFilters').addEventListener('click', clearAll);
   listingsEl.addEventListener('click', function (e) {
     if (e.target.id === 'emptyClear') clearAll();

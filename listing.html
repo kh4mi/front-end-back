@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Rental listing – Suburb.ly</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="stylesheet" href="css/leaflet.css">
+  <script src="js/leaflet.js"></script>
+  <script src="data/suburbs.js" defer></script>
+  <script src="data/rentals.js" defer></script>
+  <script src="data/rental-details.js" defer></script>
+  <script src="js/app.js" defer></script>
+  <script src="js/components.js" defer></script>
+  <script src="js/listing.js" defer></script>
+</head>
+<body>
+  <site-header active="rentals"></site-header>
+
+  <main id="main" class="container listing-page">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <a href="rentals.html">Find a Rental</a> <span aria-hidden="true">›</span>
+      <a id="crumbSuburb" href="rentals.html">Suburb</a>
+    </nav>
+
+    <div class="listing-photo" id="photo">
+      <span>No photo available</span>
+    </div>
+
+    <div class="suburb-layout listing-layout">
+      <section aria-labelledby="listingTitle">
+        <div class="listing__row listing-page__top">
+          <p class="listing__price" id="price">Loading…</p>
+          <span class="pill" id="type"></span>
+        </div>
+        <h1 id="listingTitle" class="listing-page__title">Loading…</h1>
+        <p class="listing-page__addr" id="address"></p>
+        <ul class="listing__facts listing-page__facts" id="facts" aria-label="Property features"></ul>
+
+        <div class="listing-page__actions">
+          <button class="btn btn-lg" type="button" id="saveBtn" aria-pressed="false"></button>
+          <a class="btn btn-lg" id="suburbLink" href="results.html">About this suburb <span aria-hidden="true">→</span></a>
+        </div>
+
+        <h2>About this property</h2>
+        <div class="listing-page__desc" id="description"></div>
+        <p class="listing-page__amenities" id="amenities" hidden></p>
+        <p class="muted listing-page__agency" id="agency"></p>
+
+        <div class="notice notice--info">
+          <p>This listing comes from a 2026 snapshot of Australian rental listings (<a href="references.html">Kaggle dataset</a>), not a live feed, so it may already be leased. To enquire or inspect, search for the address on the agency's own website. The photo is Google Street View of the street at this address, not a photo supplied with the listing.</p>
+        </div>
+      </section>
+
+      <aside aria-label="About the suburb">
+        <section class="panel">
+          <h2 id="fitHeading">Suburb fit</h2>
+          <p id="fitText" class="listing-page__fit"></p>
+          <div class="bars" id="bars"></div>
+        </section>
+        <section class="panel">
+          <h2>Rent compared</h2>
+          <dl id="rentCompare"></dl>
+        </section>
+        <section class="panel listing-map-panel">
+          <h2>Location</h2>
+          <div id="listingMap" class="listing-map" role="img" aria-label="Map showing where this property is"></div>
+        </section>
+        <section class="panel">
+          <h2>Nearby</h2>
+          <ul class="nearby__list listing-nearby" id="nearby"><li class="muted">Loading…</li></ul>
+          <p class="muted listing-nearby__note">Closest of each, as the crow flies from the address. Walking times assume about 5 km/h. Stops from Translink SEQ GTFS, parks from Brisbane City Council, shops, schools and hospitals from Google Places.</p>
+        </section>
+      </aside>
+    </div>
+
+    <section class="listing-page__more" aria-labelledby="moreHeading" id="moreSection" hidden>
+      <h2 id="moreHeading">More rentals nearby</h2>
+      <div class="listing-grid" id="more"></div>
+    </section>
+  </main>
+
+  <site-footer></site-footer>
+</body>
+</html>

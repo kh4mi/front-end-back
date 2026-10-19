@@ -47,6 +47,7 @@
 
         <h2 class="visually-hidden">Scores out of 10</h2>
         <div class="bars" id="bars"></div>
+        <a class="btn btn-primary btn-block btn-lg rentals-link--mobile" id="rentalsLinkMobile" href="rentals.html">View rentals <span aria-hidden="true">→</span></a>
 
         <h2>Nearby amenities</h2>
         <ul class="chips" id="amenities"></ul>
@@ -56,20 +57,24 @@
             <ul class="nearby__list" id="nearTransport"><li class="muted">Loading Translink stops…</li></ul>
           </section>
           <section class="nearby__group" aria-labelledby="nearMallsHead">
-            <h3 id="nearMallsHead">Shopping centres</h3>
+            <h3 id="nearMallsHead">🛍️ Shopping centres</h3>
             <ul class="nearby__list" id="nearMalls"><li class="muted">Loading…</li></ul>
           </section>
           <section class="nearby__group" aria-labelledby="nearShopsHead">
-            <h3 id="nearShopsHead">Supermarkets</h3>
+            <h3 id="nearShopsHead">🛒 Supermarkets</h3>
             <ul class="nearby__list" id="nearShops"><li class="muted">Loading…</li></ul>
           </section>
-          <section class="nearby__group" aria-labelledby="nearCafesHead">
-            <h3 id="nearCafesHead">Cafés</h3>
-            <ul class="nearby__list" id="nearCafes"><li class="muted">Loading…</li></ul>
+          <section class="nearby__group" aria-labelledby="nearSchoolsHead">
+            <h3 id="nearSchoolsHead">🏫 Schools</h3>
+            <ul class="nearby__list" id="nearSchools"><li class="muted">Loading…</li></ul>
           </section>
-          <section class="nearby__group nearby__group--wide" aria-labelledby="nearParksHead">
-            <h3 id="nearParksHead">Parks</h3>
-            <ul class="nearby__list nearby__list--cols" id="nearParks"></ul>
+          <section class="nearby__group" aria-labelledby="nearHospitalsHead">
+            <h3 id="nearHospitalsHead">🏥 Hospitals</h3>
+            <ul class="nearby__list" id="nearHospitals"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearParksHead">
+            <h3 id="nearParksHead">🌳 Parks</h3>
+            <ul class="nearby__list" id="nearParks"></ul>
           </section>
         </div>
         <p class="muted nearby__note" id="amenityNote"></p>
@@ -77,7 +82,7 @@
       </section>
 
       <aside aria-label="Suburb facts">
-        <a class="btn btn-primary btn-block btn-lg" id="rentalsLink" href="rentals.html" style="margin-bottom:1.25rem">View rentals <span aria-hidden="true">→</span></a>
+        <a class="btn btn-primary btn-block btn-lg rentals-link--desktop" id="rentalsLink" href="rentals.html" style="margin-bottom:1.25rem">View rentals <span aria-hidden="true">→</span></a>
         <section class="panel">
           <h2>Community Snapshot</h2>
           <dl>

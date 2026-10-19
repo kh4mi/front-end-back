@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title> Suburb Summary – Suburb.ly</title>
+		<link rel="stylesheet" href="css/theme.css">
+		<link rel="stylesheet" href="css/pages.css">
+        <link rel="stylesheet" href="css/leaflet.css">
+
+		<script src="js/leaflet.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/6.5.0/turf.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+		<script src="data/suburbs.js" defer></script>
+		<script src="data/rentals.js" defer></script>
+		<script src="js/app.js" defer></script>
+		<script src="js/components.js" defer></script>
+        <script src="js/suburb.js" defer></script>
+        <script src="js/map-expand.js" defer></script>
+	</head>
+	<body>
+        <site-header active="browse"></site-header>
+        <main>
+        <!-- Map hero: click the map to expand, use "Close map" or Esc to collapse -->
+		<section class="hero-map" id="hero-map" aria-label="Map of the suburb">
+			<!-- container to hold the map (same id as before) -->
+			<article id="map"></article>
+
+			<!-- Covers the map while collapsed so a click expands it instead of panning -->
+			<button class="hero-map__open" type="button" aria-expanded="false" aria-controls="map">
+				<span class="hero-map__hint">Click to explore the map</span>
+			</button>
+
+			<div class="hero-map__controls">
+				<button class="btn hero-map__close" type="button" hidden>Close map</button>
+				<button class="btn hero-map__save" type="button" aria-pressed="false">
+					<span aria-hidden="true">☆</span> <span class="hero-map__save-text">Save Suburb</span>
+				</button>
+			</div>
+		</section>
+
+		<div class="container suburb-layout" id="content">
+      <section aria-labelledby="suburbName">
+        <h1 id="suburbName">Loading…</h1>
+        <p class="suburb-subtitle" id="suburbSubtitle"></p>
+
+        <h2 class="visually-hidden">Scores out of 10</h2>
+        <div class="bars" id="bars"></div>
+
+        <h2>Nearby amenities</h2>
+        <ul class="chips" id="amenities"></ul>
+        <div class="nearby">
+          <section class="nearby__group" aria-labelledby="nearTransportHead">
+            <h3 id="nearTransportHead">Trains, ferries and buses</h3>
+            <ul class="nearby__list" id="nearTransport"><li class="muted">Loading Translink stops…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearMallsHead">
+            <h3 id="nearMallsHead">Shopping centres</h3>
+            <ul class="nearby__list" id="nearMalls"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearShopsHead">
+            <h3 id="nearShopsHead">Supermarkets</h3>
+            <ul class="nearby__list" id="nearShops"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group" aria-labelledby="nearCafesHead">
+            <h3 id="nearCafesHead">Cafés</h3>
+            <ul class="nearby__list" id="nearCafes"><li class="muted">Loading…</li></ul>
+          </section>
+          <section class="nearby__group nearby__group--wide" aria-labelledby="nearParksHead">
+            <h3 id="nearParksHead">Parks</h3>
+            <ul class="nearby__list nearby__list--cols" id="nearParks"></ul>
+          </section>
+        </div>
+        <p class="muted nearby__note" id="amenityNote"></p>
+
+        <div id="dataNotes"></div>
+      </section>
+
+      <aside aria-label="Suburb facts">
+        <section class="panel">
+          <h2>Community Snapshot</h2>
+          <dl>
+            <dt>Population</dt><dd>Not connected yet</dd>
+            <dt>Median age</dt><dd>Not connected yet</dd>
+            <dt>Demographic</dt><dd>Not connected yet</dd>
+            <dt>Common household type</dt><dd>Not connected yet</dd>
+          </dl>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Planned source: ABS Census.</p>
+        </section>
+        <section class="panel">
+          <h2>Housing Costs</h2>
+          <dl>
+            <dt>Median asking rent</dt><dd id="medianRent">Loading…</dd>
+            <dt>Listings in this suburb</dt><dd id="rentCount">Loading…</dd>
+          </dl>
+          <p class="muted" style="margin:.75rem 0 0;font-size:.85rem">Source: 2026 snapshot of rental listings (Kaggle). Asking rents, not ABS Census medians. Rental listings show as $ pins on the map.</p>
+        </section>
+        <a class="btn btn-primary btn-block btn-lg" id="rentalsLink" href="rentals.html">View rentals <span aria-hidden="true">→</span></a>
+      </aside>
+    </div>
+  </main>
+        <site-footer></site-footer>
+	</body>
+</html>

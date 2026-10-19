@@ -33,12 +33,13 @@
 
   // Amenities: live park names from the Brisbane City Council dataset, plus straight-line distances
   const chips = [];
-  const dests = ['uq', 'qut', 'cbd'];
-  dests.forEach(function (key) {
-    const d = SM.DESTINATIONS[key];
+  const dests = ['uq', 'qut', 'cbd'].map((key) => SM.DESTINATIONS[key]);
+  const mine = SM.destinationOf(SM.getPrefs()); // a place the visitor typed into the quiz
+  if (mine && dests.indexOf(mine) === -1) dests.unshift(mine);
+  dests.forEach(function (d) {
     chips.push('<li class="chip">' + SM.km(s, d).toFixed(1) + ' km to ' + SM.esc(d.label) + '</li>');
   });
-  const names = Array.from(new Set(s.parkNames)).slice(0, 10);
+  const names = Array.from(new Set(s.parkNames)).slice(0, 5);
   $('#amenities').innerHTML = chips.join('');
   // Council park names are all caps, so tidy them to Title Case for reading
   const tidy = (n) => n.toLowerCase().replace(/\b[a-z]/g, (c) => c.toUpperCase());
@@ -52,9 +53,11 @@
   if (s.parksLive) {
     const how = info.method === 'radius' ? 'within 1.5 km of the suburb centre' : 'in ' + s.name;
     $('#amenityNote').textContent = s.parkCount + ' parks ' + how + ' in Brisbane City Council\'s park dataset' +
-      (names.length ? ' (first ' + names.length + ' shown)' : '') + '. Stops from Translink SEQ GTFS. Shops and cafés from Google Places. Distances are straight-line from the suburb centre, not travel time.';
+      (names.length ? ' (first ' + names.length + ' shown)' : '') + '. Stops from Translink SEQ GTFS. Shops, schools and hospitals from Google Places. Distances are straight-line from the suburb centre, not travel time.';
+  } else if (!s.bcc) {
+    $('#amenityNote').textContent = 'Parks show "No data" here because our park data comes from Brisbane City Council, which only covers its own suburbs. Stops from Translink SEQ GTFS. Shops, schools and hospitals from Google Places. Distances are straight-line from the suburb centre, not travel time.';
   } else {
-    $('#amenityNote').textContent = 'Park names are unavailable because live park data could not be loaded. Stops from Translink SEQ GTFS. Shops and cafés from Google Places. Distances are straight-line from the suburb centre, not travel time.';
+    $('#amenityNote').textContent = 'Park names are unavailable because live park data could not be loaded. Stops from Translink SEQ GTFS. Shops, schools and hospitals from Google Places. Distances are straight-line from the suburb centre, not travel time.';
   }
 
 
@@ -76,9 +79,11 @@
   $('#rentCount').textContent = rent.count + (rent.count === 1 ? ' listing' : ' listings') + (rent.count && rent.count < 5 ? ' (small sample, treat as a rough guide)' : '');
 
   // Rentals link
-  const link = $('#rentalsLink');
-  link.href = 'rentals.html?suburb=' + encodeURIComponent(s.slug);
-  link.innerHTML = 'View rentals in ' + SM.esc(s.name) + ' <span aria-hidden="true">→</span>';
+  // Two copies of the button: top of the right column on wide screens, under the score bars on phones
+  document.querySelectorAll('#rentalsLink, #rentalsLinkMobile').forEach(function (link) {
+    link.href = 'rentals.html?suburb=' + encodeURIComponent(s.slug);
+    link.innerHTML = 'View rentals in ' + SM.esc(s.name) + ' <span aria-hidden="true">→</span>';
+  });
 
   // Save suburb (the button sits on the map header). Saved suburbs are listed on the results page.
   const saveBtn = document.querySelector('.hero-map__save');
@@ -94,7 +99,7 @@
 })();
 
 /* ------------------------------------------------------------------
-   Nearby shops and cafés: Google Places API (New), "Nearby Search"
+   Nearby shops, schools and hospitals: Google Places API (New), "Nearby Search"
    https://developers.google.com/maps/documentation/places/web-service/nearby-search
    Asked only when someone opens a suburb page, then saved in the browser for a week,
    so each suburb costs at most one request per category per visitor per week.
@@ -104,7 +109,8 @@ var PLACE_GROUPS = [
 	// rank "POPULARITY" finds the big centres people actually mean, rather than every small arcade next door
 	{ el: "#nearMalls", layer: "malls", types: ["shopping_mall"], radius: 4000, rank: "POPULARITY", empty: "No shopping centres within 4 km." },
 	{ el: "#nearShops", layer: "groceries", types: ["supermarket"], radius: 2000, rank: "DISTANCE", empty: "No supermarkets within 2 km." },
-	{ el: "#nearCafes", layer: "cafes", types: ["cafe"], radius: 1500, rank: "DISTANCE", empty: "No cafés within 1.5 km." }
+	{ el: "#nearSchools", layer: "schools", types: ["primary_school", "secondary_school"], radius: 2000, rank: "DISTANCE", empty: "No schools within 2 km." },
+	{ el: "#nearHospitals", layer: "hospitals", types: ["hospital"], radius: 5000, rank: "DISTANCE", empty: "No hospitals within 5 km." }
 ];
 var PLACES_CACHE_DAYS = 7;
 
@@ -188,9 +194,9 @@ function renderTransport(slug) {
 	trains.sort(byKm); ferries.sort(byKm);
 
 	var items = [];
-	trains.slice(0, 3).forEach(t => items.push(nearbyItem("Train: " + t.name, t.km)));
-	ferries.slice(0, 2).forEach(f => items.push(nearbyItem("Ferry: " + f.name, f.km)));
-	items.push('<li><span class="nearby__name">Bus: ' + busStops + ' stops within ' + (BUS_WALK_KM * 1000) + ' m</span></li>');
+	trains.slice(0, 3).forEach(t => items.push(nearbyItem("🚄 " + t.name, t.km)));
+	ferries.slice(0, 2).forEach(f => items.push(nearbyItem("🛥️ " + f.name, f.km)));
+	items.push('<li><span class="nearby__name">🚌 ' + busStops + ' stops within ' + (BUS_WALK_KM * 1000) + ' m</span></li>');
 	if (!trains.length) items.unshift('<li class="muted">No train station within ' + TRAIN_KM + ' km.</li>');
 	el.innerHTML = items.join("");
 }
@@ -213,7 +219,8 @@ var MAP_LAYERS = [
 	{ key: "malls",     label: "Shopping centres", icon: "🛍️", on: true },
 	{ key: "parks",     label: "Parks",            icon: "🌳", on: false },
 	{ key: "groceries", label: "Grocery stores",   icon: "🛒", on: false },
-	{ key: "cafes",     label: "Cafés",            icon: "☕", on: false }
+	{ key: "schools",   label: "Schools",          icon: "🏫", on: true },
+	{ key: "hospitals", label: "Hospitals",        icon: "🏥", on: true }
 ];
 var NEAR_STATION_KM = 1; // stations and terminals just outside the boundary still count
 var layerGroups = {};
@@ -252,7 +259,7 @@ function addMapKey() {
 				'<label class="map-key__row"><input type="checkbox" data-layer="transport"><span class="map-key__icon" aria-hidden="true"></span>Transportation</label>' +
 				transport.map(l => row(l, true)).join("") +
 				MAP_LAYERS.filter(l => !l.parent && l.key !== "rentals").map(l => row(l)).join("") +
-				'<p class="map-key__note">Shops and cafés: Google Places</p>' +
+				'<p class="map-key__note">Shops, schools and hospitals: Google Places</p>' +
 			"</div></details>";
 		div.addEventListener("change", function (e) {
 			var key = e.target.dataset.layer;
@@ -399,8 +406,8 @@ function runSearch(suburb, s) {
 
 	var boundaryURL = "https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/suburb-boundaries/records?where=suburb_name=%22" + encodeURIComponent(suburb.toUpperCase()) + "%22";
 
-	return fetch(boundaryURL)
-		.then(response => response.json())
+	// The Council only has outlines for its own suburbs, so elsewhere in Queensland go straight to the circle below
+	return (s.bcc ? fetch(boundaryURL).then(response => response.json()) : Promise.resolve({ results: [] }))
 		.then(data => {
 			if (!data.results || data.results.length === 0) throw new Error("No boundary found for " + suburb);
 
@@ -424,8 +431,8 @@ function runSearch(suburb, s) {
 			myMap.fitBounds(currentBoundary.getBounds(), { padding: [5, 5] });
 		})
 		.catch(error => {
-			// No boundary (e.g. the Council site is down): use a 1.5 km circle around the suburb centre instead
-			console.error("Error fetching suburb boundary:", error);
+			// No boundary (outside Brisbane City Council, or the Council site is down): use a 1.5 km circle around the suburb centre instead
+			if (s.bcc) console.error("Error fetching suburb boundary:", error);
 			addTransportMarkers(allStops, s, (lat, lon) => SM.km(s, { lat: lat, lng: lon }) <= 1.5);
 			myMap.setView([s.lat, s.lng], 14);
 		});

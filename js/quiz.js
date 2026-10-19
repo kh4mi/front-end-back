@@ -22,6 +22,7 @@
     budget: { min: base.budget.min, max: base.budget.max },
     beds: base.beds,
     destination: base.destination,
+    customDest: base.customDest || null,
     consent: !!SM.store.get('consent', false)
   };
 
@@ -122,7 +123,47 @@
 
   $('input[name="destination"][value="' + state.destination + '"]').checked = true;
   $('input[name="beds"][value="' + state.beds + '"]').checked = true;
-  $$('input[name="destination"]').forEach((r) => r.addEventListener('change', () => { state.destination = r.value; }));
+  $$('input[name="destination"]').forEach((r) => r.addEventListener('change', () => { state.destination = r.value; showPlaceBox(); }));
+
+  // "Somewhere else": picking it turns the option into a text box for typing a place
+  const placeChoice = $('.choice--place');
+  const destText = $('#destText');
+  const destError = $('#destError');
+  if (state.customDest) destText.value = state.customDest.query || state.customDest.label;
+  function showPlaceBox() {
+    const on = state.destination === 'custom';
+    placeChoice.classList.toggle('is-typing', on);
+    if (!on) destError.hidden = true;
+  }
+  placeChoice.addEventListener('click', function (e) {
+    const radio = $('#destCustom');
+    if (!radio.checked) { radio.checked = true; radio.dispatchEvent(new Event('change')); }
+    if (e.target !== destText) destText.focus();
+  });
+  destText.addEventListener('input', () => { destError.hidden = true; });
+  showPlaceBox();
+
+  // Finds the typed place before moving on (only asks Google again if the text changed). Returns true when it's OK to continue.
+  async function checkPlace() {
+    if (state.destination !== 'custom') return true;
+    const text = destText.value.trim();
+    const fail = (msg) => { destError.textContent = msg; destError.hidden = false; destText.focus(); return false; };
+    if (!text) return fail('Type a place, or choose "Not sure yet".');
+    if (state.customDest && state.customDest.query === text) return true;
+    if (!SM.GOOGLE_MAPS_KEY) return fail('Place search is not connected, so choose another option for now.');
+    nextBtn.disabled = true; nextBtn.textContent = 'Finding place…';
+    try {
+      const place = await SM.findPlace(text);
+      if (!place) return fail('We couldn\'t find "' + text + '". Try adding the suburb, e.g. "Westfield Chermside".');
+      state.customDest = Object.assign(place, { query: text });
+      return true;
+    } catch (err) {
+      console.warn('[SM] Place search failed:', err);
+      return fail('Place search isn\'t working right now, so choose another option for now.');
+    } finally {
+      nextBtn.disabled = false; nextBtn.textContent = 'Next';
+    }
+  }
   $$('input[name="beds"]').forEach((r) => r.addEventListener('change', () => { state.beds = Number(r.value); }));
 
   function readBudget() {
@@ -139,7 +180,7 @@
 
   /* ---------- Step 5: review ---------- */
   function renderReview() {
-    const dest = SM.DESTINATIONS[state.destination];
+    const dest = SM.destinationOf(state);
     const budget = state.budget.min === null && state.budget.max === null
       ? 'No limit set'
       : (state.budget.min !== null ? SM.formatPrice(state.budget.min) : '$0') + ' to ' + (state.budget.max !== null ? SM.formatPrice(state.budget.max) : 'any') + ' per week';
@@ -147,7 +188,7 @@
     const rows = [
       ['Your priorities', priorities],
       ['Weekly rent', budget],
-      ['Main destination', dest.label || 'Not set'],
+      ['Main destination', dest ? dest.label : 'Not set'],
       ['Bedrooms', state.beds + ' or more']
     ];
     $('#review').innerHTML = rows.map((r) => '<dt>' + SM.esc(r[0]) + '</dt><dd>' + SM.esc(r[1]) + '</dd>').join('');
@@ -174,7 +215,8 @@
 
   backBtn.addEventListener('click', function () { if (step > 1) showStep(step - 1, true); });
 
-  nextBtn.addEventListener('click', function () {
+  nextBtn.addEventListener('click', async function () {
+    if (step === 3 && !(await checkPlace())) return;
     if (step === 2) {
       const b = readBudget();
       if (b.error) { budgetError.textContent = b.error; budgetError.hidden = false; return; }
@@ -189,7 +231,8 @@
     SM.store.set('consent', true);
     SM.store.set('prefs', {
       order: state.order, weights: state.weights, budget: state.budget,
-      beds: state.beds, destination: state.destination, savedAt: new Date().toISOString()
+      beds: state.beds, destination: state.destination,
+      customDest: state.destination === 'custom' ? state.customDest : null, savedAt: new Date().toISOString()
     });
     window.location.href = 'results.html';
   });
