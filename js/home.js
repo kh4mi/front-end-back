@@ -5,8 +5,8 @@
 
   function render(bySlug) {
     const saved = SM.getSaved('Listings');
-    // Show listings from the suburbs we score, best fit first
-    track.innerHTML = SM.RENTALS.filter((l) => bySlug[l.slug])
+    // Show listings from the Brisbane City suburbs, best fit first
+    track.innerHTML = SM.RENTALS.filter((l) => bySlug[l.slug] && bySlug[l.slug].bcc)
       .sort((a, b) => bySlug[b.slug].fit - bySlug[a.slug].fit || a.price - b.price)
       .slice(0, 8)
       .map((l) => SM.listingCardHTML(l, bySlug[l.slug], saved.indexOf(l.id) >= 0))

@@ -32,6 +32,38 @@
     other: { label: null }
   };
 
+  // Which suburbs Browse suburbs and Find a Rental show: the Brisbane City Council suburbs (default, where every
+  // score has data) or all of Queensland. Remembered in the browser.
+  SM.AREAS = { brisbane: 'Brisbane City suburbs', qld: 'All of Queensland' };
+  SM.getArea = () => (SM.store.get('area', 'brisbane') === 'qld' ? 'qld' : 'brisbane');
+  SM.setArea = (area) => SM.store.set('area', area === 'qld' ? 'qld' : 'brisbane');
+  SM.inArea = (suburb, area) => area === 'qld' || !!(suburb && suburb.bcc);
+
+  // The place the visitor picked in the quiz, or null when they're not sure.
+  // "custom" is a place they typed in, found with Google Places and saved as prefs.customDest {label, lat, lng}.
+  SM.destinationOf = function (prefs) {
+    if (!prefs) return null;
+    if (prefs.destination === 'custom') return prefs.customDest && typeof prefs.customDest.lat === 'number' ? prefs.customDest : null;
+    const d = SM.DESTINATIONS[prefs.destination];
+    return d && d.label ? d : null;
+  };
+
+  // Looks up a typed place name with Google Places API (New) "Text Search". Returns {label, lat, lng} or null.
+  // Results lean towards Brisbane but anywhere in Australia can be found.
+  SM.findPlace = async function (text) {
+    const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Goog-Api-Key': SM.GOOGLE_MAPS_KEY, 'X-Goog-FieldMask': 'places.displayName,places.location' },
+      body: JSON.stringify({
+        textQuery: text, regionCode: 'AU', pageSize: 1,
+        locationBias: { circle: { center: { latitude: SM.CBD.lat, longitude: SM.CBD.lng }, radius: 50000 } }
+      })
+    });
+    if (!res.ok) throw new Error('Places HTTP ' + res.status);
+    const p = ((await res.json()).places || [])[0];
+    return p ? { label: p.displayName.text, lat: p.location.latitude, lng: p.location.longitude } : null;
+  };
+
   // Simple line icons (drawn for this project, 24x24, use currentColor).
   const ICONS = {
     bed:    '<path d="M3 5v14M3 15h18v4M21 15v-3a3 3 0 0 0-3-3h-7v6"/><circle cx="7" cy="11" r="1.6"/>',
@@ -137,7 +169,7 @@
           d) turn counts into a 1–10 score (see SM.buildSuburbs)
      ------------------------------------------------------------------ */
   const PARKS_BASE = 'https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/park-locations';
-  const PARKS_CACHE_KEY = 'sm.parks.v3'; // v3: also keeps each park's location (for the suburb map)
+  const PARKS_CACHE_KEY = 'sm.parks.v4'; // v4: only Brisbane City Council suburbs (the rest of Queensland has no Council parks)
   const RADIUS_KM = 1.5;
 
   async function getJson(url) {
@@ -191,7 +223,8 @@
 
   function summariseParks(rows, fields) {
     const bySuburb = {};
-    SM.SUBURBS.forEach((s) => { bySuburb[s.slug] = { count: 0, names: [], points: [] }; });
+    const council = SM.SUBURBS.filter((s) => s.bcc); // the Council's parks only cover its own suburbs
+    council.forEach((s) => { bySuburb[s.slug] = { count: 0, names: [], points: [] }; });
     const add = (slug, row) => {
       bySuburb[slug].count += 1;
       const nm = fields.name ? row[fields.name] : null;
@@ -203,7 +236,7 @@
     let method = 'suburb-field';
     let matched = 0;
     if (fields.suburb) {
-      const slugByName = new Map(SM.SUBURBS.map((s) => [s.name.toLowerCase(), s.slug]));
+      const slugByName = new Map(council.map((s) => [s.name.toLowerCase(), s.slug]));
       rows.forEach((row) => {
         const slug = slugByName.get(String(row[fields.suburb] || '').trim().toLowerCase());
         if (slug) { matched += 1; add(slug, row); }
@@ -214,7 +247,7 @@
       rows.forEach((row) => {
         const p = readPoint(row[fields.geo]);
         if (!p) return;
-        SM.SUBURBS.forEach((s) => { if (SM.km(p, s) <= RADIUS_KM) add(s.slug, row); });
+        council.forEach((s) => { if (SM.km(p, s) <= RADIUS_KM) add(s.slug, row); });
       });
     }
     const totalCounted = Object.values(bySuburb).reduce((sum, b) => sum + b.count, 0);
@@ -270,11 +303,13 @@
 
     if (parkInfo && parkInfo.ok) {
       // Parks score = where the suburb ranks for number of parks, mapped onto 1–10.
+      // Only Brisbane City Council suburbs have park data; the rest of Queensland shows "No data".
       const park = (s) => parkInfo.bySuburb[s.slug] || { count: 0, names: [], points: [] };
-      const counts = list.map((s) => park(s).count);
-      list.forEach((s, i) => {
+      const council = list.filter((s) => s.bcc);
+      const counts = council.map((s) => park(s).count);
+      council.forEach((s, i) => {
         const fewer = counts.filter((c) => c < counts[i]).length;
-        s.scores.parks = Math.max(1, Math.min(10, 1 + Math.round((9 * fewer) / (list.length - 1))));
+        s.scores.parks = Math.max(1, Math.min(10, 1 + Math.round((9 * fewer) / (council.length - 1))));
         s.parkCount = counts[i];
         s.parkNames = park(s).names;
         s.parkPoints = park(s).points || [];
@@ -345,8 +380,8 @@
       }
     }
     // Destination: straight-line distance to where you'll spend most of your time
-    const dest = SM.DESTINATIONS[prefs.destination];
-    if (dest && dest.label) {
+    const dest = SM.destinationOf(prefs);
+    if (dest) {
       const km = SM.km(s, dest);
       parts.push({
         key: 'commute', label: 'Close to ' + dest.label, weight: SM.EXTRA_WEIGHT,
@@ -415,9 +450,10 @@
      Images load only when a card scrolls into view (loading="lazy"), so you only pay for what people see. */
   SM.GOOGLE_MAPS_KEY = 'AIzaSyAaPAgRbPjWBBYLKT-OMO4bOEH_4W2zY6o';
 
-  SM.streetViewURL = function (listing) {
+  // size is width x height in pixels (Street View Static allows up to 640x640)
+  SM.streetViewURL = function (listing, size) {
     if (!SM.GOOGLE_MAPS_KEY || typeof listing.lat !== 'number') return null;
-    return 'https://maps.googleapis.com/maps/api/streetview?size=640x400&fov=80&source=outdoor' +
+    return 'https://maps.googleapis.com/maps/api/streetview?size=' + (size || '640x400') + '&fov=80&source=outdoor' +
       '&return_error_code=true' + // 404 instead of a grey "no imagery" picture, so the placeholder shows
       '&location=' + listing.lat + ',' + listing.lng + '&key=' + encodeURIComponent(SM.GOOGLE_MAPS_KEY);
   };
@@ -432,6 +468,7 @@
   };
 
   // `suburb` is the scored suburb from data/suburbs.js, or undefined for suburbs we don't score (no fit shown).
+  // The title links to listing.html; .listing__link stretches over the whole card so any click opens it (the star still saves).
   SM.listingCardHTML = function (listing, suburb, isSaved) {
     const address = listing.street + ', ' + listing.suburb + ' ' + (listing.state || 'QLD') + ' ' + listing.postcode;
     const fitHTML = suburb
@@ -452,7 +489,8 @@
           '<p class="listing__price">' + SM.formatPrice(listing.price) + '<span>/wk</span></p>' +
           '<span class="pill">' + SM.esc(listing.type) + '</span>' +
         '</div>' +
-        (listing.title ? '<h3 class="listing__title">' + SM.esc(listing.title) + '</h3>' : '') +
+        '<h3 class="listing__title"><a class="listing__link" href="listing.html?id=' + encodeURIComponent(listing.id) + '">' +
+          SM.esc(listing.title || listing.street) + '</a></h3>' +
         '<div class="listing__row">' +
           '<p class="listing__addr">' + SM.esc(address) + '</p>' + fitHTML +
         '</div>' +

@@ -61,8 +61,14 @@
             <label class="choice"><input type="radio" name="destination" value="uq"> UQ St Lucia</label>
             <label class="choice"><input type="radio" name="destination" value="qut"> QUT Gardens Point</label>
             <label class="choice"><input type="radio" name="destination" value="cbd"> Brisbane CBD</label>
-            <label class="choice"><input type="radio" name="destination" value="other"> Somewhere else / not sure yet</label>
+            <div class="choice choice--place">
+              <input type="radio" name="destination" value="custom" id="destCustom">
+              <label class="choice__label" for="destCustom">Somewhere else</label>
+              <input class="choice__text" type="text" id="destText" placeholder="Type a place, e.g. South Bank" autocomplete="off" aria-label="Type the place where you'll spend most of your time">
+            </div>
+            <label class="choice"><input type="radio" name="destination" value="other"> Not sure yet</label>
           </fieldset>
+          <p class="field-error" id="destError" role="alert" hidden></p>
         </section>
 
         <!-- Step 4: bedrooms -->

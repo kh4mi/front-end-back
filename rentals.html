@@ -43,6 +43,13 @@
 
     <form class="filter-panel" id="filterPanel" hidden>
       <div class="field">
+        <label for="fArea">Area</label>
+        <select id="fArea">
+          <option value="brisbane">Brisbane City suburbs</option>
+          <option value="qld">All of Queensland</option>
+        </select>
+      </div>
+      <div class="field">
         <label for="fSuburb">Suburb</label>
         <select id="fSuburb"><option value="">Any suburb</option></select>
       </div>
@@ -64,7 +71,7 @@
     </form>
 
     <div class="notice notice--warn">
-      <p><strong>Real listings, but not live.</strong> These come from a 2026 snapshot of Australian rental listings (<a href="references.html">Kaggle dataset</a>), so some may already be leased. The "fit" number beside each listing is how well its suburb matches your priorities. Listings in suburbs we don't score yet show "No fit score" and appear after the others.</p>
+      <p><strong>Real listings, but not live.</strong> These come from a 2026 snapshot of Australian rental listings (<a href="references.html">Kaggle dataset</a>), so some may already be leased. The "fit" number beside each listing is how well its suburb matches your priorities. Brisbane City listings show first; choose "All of Queensland" under Edit filters, or search a suburb by name, to see the rest. Outside Brisbane some scores show "No data" (no Translink or Council park data there), which counts as average.</p>
     </div>
 
     <div class="listing-grid" id="listings"></div>

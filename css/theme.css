@@ -348,6 +348,18 @@ site-header {
   position: sticky;
   top: 0;
   z-index: 1100;
+  transition: transform .25s ease;
+}
+
+/* Slid up out of view while scrolling down (js/components.js) */
+site-header.is-hidden {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  site-header {
+    transition: none;
+  }
 }
 
 .site-header {
@@ -395,6 +407,195 @@ site-header {
 .site-nav a[aria-current="page"] {
   font-weight: 800;
   border-bottom-color: var(--c-coral);
+}
+
+/* "About" menu in the navbar: a heading that opens on hover, or on click / Enter (see js/components.js) */
+.site-nav {
+  align-items: center;
+}
+
+.nav-menu {
+  position: relative;
+}
+
+.nav-menu__toggle {
+  font: inherit;
+  color: var(--c-ink);
+  background: none;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  padding: .25rem 0;
+  cursor: default;
+}
+
+.nav-menu__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
+
+.nav-menu__arrow {
+  width: .65em;
+  height: .65em;
+  transition: transform .2s ease;
+}
+
+.nav-menu:hover .nav-menu__arrow,
+.nav-menu.is-open .nav-menu__arrow {
+  transform: rotate(90deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-menu__arrow {
+    transition: none;
+  }
+}
+
+.nav-menu:hover .nav-menu__toggle {
+  border-bottom-color: var(--c-yellow);
+}
+
+.nav-menu--current .nav-menu__toggle {
+  font-weight: 800;
+  border-bottom-color: var(--c-coral);
+}
+
+.nav-menu__list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: -1rem;
+  z-index: 10;
+  min-width: 11rem;
+  flex-direction: column;
+  padding: .5rem 1rem;
+  margin-top: .35rem;
+  background: var(--c-nav);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+}
+
+/* a see-through strip over the gap, so the menu stays open while the pointer moves down to it */
+.nav-menu__list::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -.6rem;
+  height: .6rem;
+}
+
+.nav-menu:hover .nav-menu__list,
+.nav-menu.is-open .nav-menu__list {
+  display: flex;
+}
+
+.nav-menu__list a {
+  padding: .4rem 0;
+  white-space: nowrap;
+}
+
+/* Holds the links and the Sign up / account area; on mobile it folds away behind the hamburger */
+.site-header__menu {
+  display: contents;
+}
+
+/* Hamburger button, only shown on small screens */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  margin-right: -.5rem;
+  color: var(--c-ink);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+.nav-toggle__icon {
+  width: 2rem;
+  height: 2rem;
+  overflow: visible;
+}
+
+.nav-toggle__icon line {
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  transform-box: view-box;
+  transform-origin: 12.5px 12.5px;
+  transition: transform .25s ease, opacity .2s ease;
+}
+
+/* Closed: the three lines get shorter like the original icon (14, 12 and 7 long, lined up on the left) */
+.nav-toggle__icon line:nth-child(2) { transform: translateX(-1px) scaleX(.857); }
+.nav-toggle__icon line:nth-child(3) { transform: translateX(-3.5px) scaleX(.5); }
+
+/* Open: top and bottom lines meet in the middle and cross at 45 degrees, the middle line fades out */
+.site-header.is-open .nav-toggle__icon line:nth-child(1) { transform: rotate(45deg) translateY(4px); }
+.site-header.is-open .nav-toggle__icon line:nth-child(2) { transform: scaleX(0); opacity: 0; }
+.site-header.is-open .nav-toggle__icon line:nth-child(3) { transform: rotate(-45deg) translateY(-4px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-toggle__icon line { transition: none; }
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    flex-wrap: wrap;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .site-header__menu {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: .25rem 0 .75rem;
+  }
+
+  .site-header.is-open .site-header__menu {
+    display: flex;
+  }
+
+  .site-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .5rem;
+    width: 100%;
+    font-size: 1.1rem;
+  }
+
+  /* On a phone the About links are listed straight under "About" instead of in a pop-up */
+  .nav-menu__toggle {
+    pointer-events: none;
+    font-weight: 700;
+  }
+
+  .nav-menu__arrow {
+    display: none;
+  }
+
+  .nav-menu__list,
+  .nav-menu:hover .nav-menu__list,
+  .nav-menu.is-open .nav-menu__list {
+    display: flex;
+    position: static;
+    min-width: 0;
+    margin: .25rem 0 0;
+    padding: 0 0 0 1rem;
+    box-shadow: none;
+  }
+
+  .nav-menu__list::before {
+    display: none;
+  }
 }
 
 /* ---------- Footer (site-footer component) ---------- */

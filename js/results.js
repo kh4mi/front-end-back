@@ -14,14 +14,18 @@
 
   const data = await SM.init();
   const prefs = data.prefs;
-  const shown = data.ranked.slice(0, MAX_SHOWN);
-  const dest = prefs && SM.DESTINATIONS[prefs.destination] && SM.DESTINATIONS[prefs.destination].label
-    ? SM.DESTINATIONS[prefs.destination] : null;
+  const area = SM.getArea();
+  const shown = data.ranked.filter((s) => SM.inArea(s, area)).slice(0, MAX_SHOWN);
+  const areaPick = $('#areaPick');
+  areaPick.value = area;
+  areaPick.addEventListener('change', function () { SM.setArea(areaPick.value); window.location.reload(); });
+  const dest = SM.destinationOf(prefs);
 
   /* ---------- Heading, chips, notes ---------- */
   $('#resultsHeading').textContent = prefs
     ? shown.length + ' suburbs match your priorities'
     : 'Top ' + shown.length + ' suburbs to explore';
+  if (area === 'qld') $('#sortNote').textContent = 'Sorted by overall fit. Outside Brisbane City, missing transport or park data counts as average, so those suburbs can rank higher than the data really shows.';
 
   const chipsEl = $('#filterChips');
   if (prefs) {
@@ -72,7 +76,7 @@
           (savedSlugs.indexOf(s.slug) >= 0 ? ' <span class="match-card__saved">★ Saved</span>' : '') + '</p>' +
         '<h2>' + SM.esc(s.name) + ', ' + s.postcode + '</h2>' +
         '<ul class="scores" aria-label="Scores out of 10">' + scores + '</ul>' + distance +
-        '<details class="why"' + (i === 0 ? ' open' : '') + '>' +
+        '<details class="why">' +
           '<summary>Why ' + s.fit + '%?</summary>' +
           '<p class="why__intro">' + whyIntro + '</p>' +
           '<ul class="why__list" aria-label="How each factor adds to the ' + s.fit + '% fit">' + why + '</ul>' +

@@ -286,6 +286,42 @@
   color: var(--c-grey-600);
 }
 
+/* Phones: "Doesn't / matter" and "Very / important" each take two short lines, so they sit on one row with 1–5 between them */
+@media (max-width: 720px) {
+  .rating {
+    flex-wrap: nowrap;
+    gap: .4rem;
+  }
+
+  .rating__end {
+    width: min-content;
+    line-height: 1.15;
+    font-size: .8rem;
+  }
+
+  .rating__end:last-child {
+    text-align: left;
+  }
+
+  .rating__end:first-of-type {
+    text-align: right;
+  }
+}
+
+@media (max-width: 400px) {
+  .rating {
+    gap: .25rem;
+  }
+
+  .rating__opt input+span {
+    width: 2.1rem;
+  }
+
+  .rating__end {
+    font-size: .75rem;
+  }
+}
+
 .field-row {
   display: flex;
   flex-wrap: wrap;
@@ -347,7 +383,37 @@ fieldset.choices legend {
   background: var(--c-yellow);
 }
 
-.choice:has(input:focus-visible) {
+/* "Somewhere else": once picked, the words give way to a text box */
+.choice__label {
+  cursor: pointer;
+}
+
+.choice input.choice__text,
+.choice input.choice__text:focus-visible {
+  display: none;
+  flex: 1;
+  min-width: 0;
+  font: inherit;
+  font-weight: 400;
+  padding: .45rem .6rem;
+  border: 0;
+  outline: none;
+  background: var(--c-paper);
+}
+
+.choice--place.is-typing .choice__label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.choice--place.is-typing input.choice__text {
+  display: block;
+}
+
+.choice:has(input[type="radio"]:focus-visible) {
   outline: 3px solid var(--c-ink);
   outline-offset: 3px;
 }
@@ -383,6 +449,12 @@ fieldset.choices legend {
   top: var(--header-h);
   height: calc(100vh - var(--header-h));
   background: var(--c-grey-100);
+  transition: top .25s ease;
+}
+
+/* while the navbar is slid away, the map moves up into its space */
+.nav-hidden .results__map {
+  top: 0;
 }
 
 #map {
@@ -396,6 +468,20 @@ fieldset.choices legend {
 
 .results__head h1 {
   font-size: 1.6rem;
+}
+
+/* "Show: Brisbane City suburbs / All of Queensland" */
+.area-pick {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  margin: .25rem 0 .5rem;
+  font-size: .92rem;
+}
+
+.area-pick select {
+  width: auto;
+  padding: .3rem .5rem;
 }
 
 .filter-row {
@@ -710,7 +796,7 @@ fieldset.choices legend {
 
 .nearby__group {
   border: var(--border);
-  padding: .75rem .9rem;
+  padding: 1.25rem 1rem;
   background: var(--c-paper);
 }
 
@@ -834,9 +920,23 @@ fieldset.choices legend {
   color: var(--c-grey-600);
 }
 
+/* "View rentals": top of the right column on wide screens, under the score bars once the page is one column */
+.rentals-link--mobile {
+  display: none;
+}
+
 @media (max-width: 860px) {
   .suburb-layout {
     grid-template-columns: 1fr;
+  }
+
+  .rentals-link--mobile {
+    display: flex;
+    margin: 1.5rem 0 2rem;
+  }
+
+  .rentals-link--desktop {
+    display: none;
   }
 }
 
@@ -969,7 +1069,13 @@ fieldset.choices legend {
   align-items: center;
   justify-content: space-between;
   border: var(--border);
-  padding: .6rem 1rem;
+  background: var(--c-grey-100); /* same grey as the consent box */
+  padding: .75rem 1rem;
+}
+
+/* keeps the badge on the right even when a long description pushes it onto its own line */
+.source-list .status {
+  margin-left: auto;
 }
 
 .status {
@@ -1287,4 +1393,203 @@ fieldset.choices legend {
 
 .saved-empty {
   color: var(--c-grey-600);
+}
+/* ---------- Listing page (listing.html) ---------- */
+/* The card title link covers the whole card, so clicking anywhere opens the listing; the star sits above it */
+.listing__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.listing__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.listing__link:hover,
+.listing__link:focus-visible {
+  text-decoration: underline;
+}
+
+.listing .save-btn {
+  z-index: 2;
+}
+
+.listing-page {
+  padding-top: 1.25rem;
+  padding-bottom: 3rem;
+}
+
+.crumbs {
+  font-size: .9rem;
+  margin-bottom: 1rem;
+}
+
+.crumbs a {
+  color: inherit;
+}
+
+.listing-photo {
+  position: relative;
+  aspect-ratio: 32 / 15;
+  max-height: 460px;
+  width: 100%;
+  display: grid;
+  place-items: center;
+  background: var(--c-grey-200);
+  color: var(--c-grey-600);
+  overflow: hidden;
+}
+
+.listing-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.listing-layout {
+  padding-top: 1.75rem;
+}
+
+.listing-page__top {
+  justify-content: flex-start;
+}
+
+.listing-page__title {
+  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  margin: .5rem 0 .35rem;
+}
+
+.listing-page__addr {
+  font-size: 1.05rem;
+  margin: 0 0 .75rem;
+}
+
+.listing-page__facts {
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.listing-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin: 1.25rem 0 2rem;
+}
+
+.listing-page__desc p,
+.listing-page__desc ul {
+  margin: 0 0 .9rem;
+  max-width: 65ch;
+}
+
+.listing-page__amenities,
+.listing-page__agency {
+  margin: 0 0 1.25rem;
+}
+
+.listing-page__fit {
+  margin: 0 0 .75rem;
+  color: var(--c-grey-600);
+  font-size: .9rem;
+}
+
+.listing-map {
+  height: 260px;
+}
+
+.listing-page__more {
+  margin-top: 3rem;
+}
+
+/* ---------- About page ---------- */
+/* Team: 3 people on the first row, 2 centred on the second (6-column grid, each card spans 2) */
+.team {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 1rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1.25rem;
+}
+
+.team__member {
+  grid-column: span 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: .25rem;
+  padding: 1.5rem 1rem;
+  background: var(--c-paper);
+}
+
+.team__member:nth-child(4) {
+  grid-column: 2 / span 2;
+}
+
+/* Photo in a circle; the initials show until the photo (images/team/<name>.jpg) is added */
+.team__photo {
+  position: relative;
+  width: 10rem;
+  height: 10rem;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  margin-bottom: .75rem;
+  background: var(--c-grey-200);
+  color: var(--c-grey-600);
+  font-size: 1.75rem;
+  font-weight: 700;
+}
+
+.team__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.team__role {
+  color: var(--c-grey-600);
+  font-size: .9rem;
+}
+
+@media (max-width: 640px) {
+  .team {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .team__member,
+  .team__member:nth-child(4) {
+    grid-column: auto;
+  }
+}
+
+/* Nearby panel on the listing page: label on the left, closest place and distance on the right */
+.listing-nearby li {
+  display: grid;
+  grid-template-columns: 7.5rem 1fr;
+  gap: .75rem;
+  padding: .35rem 0;
+  border-bottom: 1px solid var(--c-grey-100);
+}
+
+.listing-nearby li:last-child {
+  border-bottom: 0;
+}
+
+.listing-nearby__value {
+  display: flex;
+  flex-direction: column;
+}
+
+.listing-nearby__note {
+  margin: .75rem 0 0;
+  font-size: .8rem;
 }
