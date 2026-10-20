@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -8,92 +9,145 @@
   <link rel="stylesheet" href="css/pages.css">
   <script src="js/components.js" defer></script>
 </head>
+
 <body>
   <site-header></site-header>
 
   <main id="main" class="container how">
     <h1>References and credits</h1>
-    <p class="lead" style="margin-inline:0">Everything on this site that comes from outside our team, and where to find it.</p>
+    <p class="lead" style="margin-inline:0">Everything on this site that comes from outside our team, and where to find
+      it.</p>
 
     <h2>Data</h2>
     <ul>
       <li>Brisbane City Council. <em>Park – Locations</em> [open dataset]. Brisbane City Council Open Data.
-        <a href="https://data.brisbane.qld.gov.au/explore/dataset/park-locations/api/">data.brisbane.qld.gov.au/explore/dataset/park-locations</a>.
-        Used live to calculate the Parks &amp; Recreation score. </li>
+        <a
+          href="https://data.brisbane.qld.gov.au/explore/dataset/park-locations/api/">data.brisbane.qld.gov.au/explore/dataset/park-locations</a>.
+        Used live to calculate the Parks &amp; Recreation score.
+      </li>
       <li>Opendatasoft. <em>Explore API v2.1</em> (how the Council serves its data).
-        <a href="https://data.brisbane.qld.gov.au/api-console/explore/v2.1/">data.brisbane.qld.gov.au/api-console/explore/v2.1</a>.</li>
-      <li>Queensland Police Service. (2026). <em>Reported offences rates by division</em> [Data set]. Queensland Government.
-        <a href="https://open-crime-data.s3-ap-southeast-2.amazonaws.com/Crime%20Statistics/division_Reported_Offences_Rates.csv">open-crime-data.s3-ap-southeast-2.amazonaws.com/Crime Statistics/division_Reported_Offences_Rates.csv</a>.
-        Offences against the person and property per 100,000 people over the latest 12 months, used for the Safety score (tools/build-suburbs.py).</li>
+        <a
+          href="https://data.brisbane.qld.gov.au/api-console/explore/v2.1/">data.brisbane.qld.gov.au/api-console/explore/v2.1</a>.
+      </li>
+      <li>Queensland Police Service. (2026). <em>Reported offences rates by division</em> [Data set]. Queensland
+        Government.
+        <a
+          href="https://open-crime-data.s3-ap-southeast-2.amazonaws.com/Crime%20Statistics/division_Reported_Offences_Rates.csv">open-crime-data.s3-ap-southeast-2.amazonaws.com/Crime
+          Statistics/division_Reported_Offences_Rates.csv</a>.
+        Offences against the person and property per 100,000 people over the latest 12 months, used for the Safety score
+        (tools/build-suburbs.py).
+      </li>
       <li>Queensland Police Service. <em>QPS divisions</em> [Data set]. Queensland Government.
         <a href="https://www.data.qld.gov.au/dataset/qps-divisions">data.qld.gov.au/dataset/qps-divisions</a>.
-        Police division boundaries, used to find which division each suburb is in.</li>
-      <li>Geoscape Australia (formerly PSMA). <em>Queensland suburb and locality boundaries</em> (2017), converted to GeoJSON by tonywr71.
+        Police division boundaries, used to find which division each suburb is in.
+      </li>
+      <li>Geoscape Australia (formerly PSMA). <em>Queensland suburb and locality boundaries</em> (2017), converted to
+        GeoJSON by tonywr71.
         <a href="https://github.com/tonywr71/GeoJson-Data">github.com/tonywr71/GeoJson-Data</a>.
-        Used for each suburb's centre point and area, and to count the bus stops inside it.</li>
+        Used for each suburb's centre point and area, and to count the bus stops inside it.
+      </li>
       <li>Proctor, M. <em>Australian Postcodes</em> [dataset].
-        <a href="https://github.com/matthewproctor/australianpostcodes">github.com/matthewproctor/australianpostcodes</a>. Used for suburb postcodes.</li>
-      <li>Australian Bureau of Statistics. (2022). <em>2021 Census of Population and Housing: General Community Profile DataPack, Suburbs and Localities, Queensland</em> (tables G01 and G02) [Data set]. ABS.
-        <a href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au/census/find-census-data/datapacks</a>. Licence: CC BY 4.0.
-        Median weekly rent (Affordability score), population, age, birthplace, household size, household income and mortgage repayments on suburb pages (tools/build-suburbs.py).</li>
-      <li>Affordability, transport and safety scores are ranks across the 474 Queensland suburbs we score (all Brisbane City Council suburbs plus every other Queensland suburb with a listing), calculated by our team from the datasets on this page.</li>
+        <a
+          href="https://github.com/matthewproctor/australianpostcodes">github.com/matthewproctor/australianpostcodes</a>.
+        Used for suburb postcodes.
+      </li>
+      <li>Australian Bureau of Statistics. (2022). <em>2021 Census of Population and Housing: General Community Profile
+          DataPack, Suburbs and Localities, Queensland</em> (tables G01 and G02) [Data set]. ABS.
+        <a
+          href="https://www.abs.gov.au/census/find-census-data/datapacks">abs.gov.au/census/find-census-data/datapacks</a>.
+        Licence: CC BY 4.0.
+        Median weekly rent (Affordability score), population, age, birthplace, household size, household income and
+        mortgage repayments on suburb pages (tools/build-suburbs.py).
+      </li>
+      <li>Affordability, transport and safety scores are ranks across the 474 Queensland suburbs we score (all Brisbane
+        City Council suburbs plus every other Queensland suburb with a listing), calculated by our team from the
+        datasets on this page.</li>
       <li>kanchana1990. <em>Australian Rental Market Data 2026</em> [dataset]. Kaggle.
-        <a href="https://www.kaggle.com/datasets/kanchana1990/australian-rental-market-data-2026">kaggle.com/datasets/kanchana1990/australian-rental-market-data-2026</a>.
-        Licence: add the licence shown on the Kaggle page. A downloaded snapshot (not live), filtered to Queensland listings by tools/convert-rentals.py. Used for rental listings, map pins and the median asking rent on suburb pages.</li>
-      <li>Queensland SEQ GTFS data is used to filter through and mark stop locations, in future this dataset will also be used to find routes and locations.
-        <a href ="https://www.data.qld.gov.au/dataset/general-transit-feed-specification-gtfs-translink/resource/e43b6b9f-fc2b-4630-a7c9-86dd5483552b">data.brisbane.qld.gov.au//dataset/general-transit-feed-specification-gtfs-translink/resource/e43b6b9f-fc2b-4630-a7c9-86dd5483552b</a>
+        <a
+          href="https://www.kaggle.com/datasets/kanchana1990/australian-rental-market-data-2026">kaggle.com/datasets/kanchana1990/australian-rental-market-data-2026</a>.
+        Licence: add the licence shown on the Kaggle page. A downloaded snapshot (not live), filtered to Queensland
+        listings by tools/convert-rentals.py. Used for rental listings, map pins and the median asking rent on suburb
+        pages.
+      </li>
+      <li>Queensland SEQ GTFS data is used to filter through and mark stop locations, in future this dataset will also
+        be used to find routes and locations.
+        <a
+          href="https://www.data.qld.gov.au/dataset/general-transit-feed-specification-gtfs-translink/resource/e43b6b9f-fc2b-4630-a7c9-86dd5483552b">data.brisbane.qld.gov.au//dataset/general-transit-feed-specification-gtfs-translink/resource/e43b6b9f-fc2b-4630-a7c9-86dd5483552b</a>
       </li>
       <li>Brisbane City Council. <em>Suburb Boundaries </em> [open dataset]. Brisbane City Council Open Data.
-        <a href="https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/suburb-boundaries/">data.brisbane.qld.gov.au/explore/dataset/suburb-boundaries</a>.
-        Used live to calculate the boundary shape. </li>
+        <a
+          href="https://data.brisbane.qld.gov.au/api/explore/v2.1/catalog/datasets/suburb-boundaries/">data.brisbane.qld.gov.au/explore/dataset/suburb-boundaries</a>.
+        Used live to calculate the boundary shape.
+      </li>
       <li>Opendatasoft. <em>Explore API v2.1</em> (how the Council serves its data).
     </ul>
 
     <h2>Code and libraries</h2>
     <ul>
       <li>Leaflet 1.9.4, an open-source JavaScript map library, loaded from cdnjs.
-        <a href="https://leafletjs.com/">leafletjs.com</a> · <a href="https://cdnjs.com/libraries/leaflet">cdnjs.com/libraries/leaflet</a>. Used on the "Browse suburbs" page (js/results.js).</li>
-      <li>MDN Web Docs. <em>HTML Drag and Drop API</em>, the pattern used to reorder priorities in the quiz (js/quiz.js).
-        <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API">developer.mozilla.org</a>.</li>
+        <a href="https://leafletjs.com/">leafletjs.com</a> · <a
+          href="https://cdnjs.com/libraries/leaflet">cdnjs.com/libraries/leaflet</a>. Used on the "Browse suburbs" page
+        (js/results.js).
+      </li>
+      <li>MDN Web Docs. <em>HTML Drag and Drop API</em>, the pattern used to reorder priorities in the quiz
+        (js/quiz.js).
+        <a href="https://developer.mozilla.org/en-US/docs/Web/API/HTML_Drag_and_Drop_API">developer.mozilla.org</a>.
+      </li>
       <li>Haversine formula for straight-line distances (js/app.js).</li>
     </ul>
 
     <h2>Nearby places</h2>
     <ul>
-      <li>Shopping centres, supermarkets and cafés on suburb pages from the Google Places API (New), Nearby Search, &copy; Google.
-        <a href="https://developers.google.com/maps/documentation/places/web-service/nearby-search">developers.google.com/maps/documentation/places/web-service/nearby-search</a>.</li>
+      <li>Shopping centres, supermarkets, schools, hospitals and cafés on suburb pages from the Google Places API (New),
+        Nearby Search, &copy; Google.
+        <a
+          href="https://developers.google.com/maps/documentation/places/web-service/nearby-search">developers.google.com/maps/documentation/places/web-service/nearby-search</a>.
+      </li>
     </ul>
 
     <h2>Listing photos</h2>
     <ul>
       <li>Street-level photos of each listing's address from the Google Street View Static API, &copy; Google.
-        <a href="https://developers.google.com/maps/documentation/streetview">developers.google.com/maps/documentation/streetview</a>.
-        These show the street at the listed location, not photos supplied with the listing.</li>
+        <a
+          href="https://developers.google.com/maps/documentation/streetview">developers.google.com/maps/documentation/streetview</a>.
+        These show the street at the listed location, not photos supplied with the listing.
+      </li>
     </ul>
 
     <h2>Map tiles</h2>
     <ul>
-      <li>Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, available under the Open Database Licence.</li>
+      <li>Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, available
+        under the Open Database Licence.</li>
     </ul>
 
     <h2>Font</h2>
     <ul>
-      <li>Open Sauce One, from <a href="https://www.1001fonts.com/open-sauce-font.html">1001fonts.com/open-sauce-font.html</a>. Check the licence file that comes with the download and note the licence name here.</li>
+      <li>Open Sauce One, from <a
+          href="https://www.1001fonts.com/open-sauce-font.html">1001fonts.com/open-sauce-font.html</a>. Check the
+        licence file that comes with the download and note the licence name here.</li>
     </ul>
 
     <h2>Images and icons</h2>
     <ul>
-      <li>Icons on this site are simple inline SVG drawings made for this project, except the navbar menu arrow: "Right Arrow Backup 2" from SVG Repo.
-        <a href="https://www.svgrepo.com/">svgrepo.com</a>.</li>
+      <li>Icons on this site are simple inline SVG drawings made for this project, except the navbar menu arrow: "Right
+        Arrow Backup 2" from SVG Repo.
+        <a href="https://www.svgrepo.com/">svgrepo.com</a>.
+      </li>
       <li>Property and suburb photo areas are placeholders. No third-party photos are used.</li>
     </ul>
 
     <h2>Research that shaped the idea</h2>
     <ul>
-      <li>AHURI research on temporary migrants and the Australian rental market, discussed in the team's proposal. Add the full citation from the proposal here.</li>
+      <li>AHURI research on temporary migrants and the Australian rental market, discussed in the team's proposal.
+        Ahuri. (2025, November 20). Tackling the temporary visa holder housing blind spot.
+        https://www.ahuri.edu.au/analysis/news/tackling-temporary-visa-holder-housing-blind-spot
+        Ahuri. (2019, July 19). How many people are relocating to Australia, and where?.
+        https://www.ahuri.edu.au/analysis/brief/how-many-people-are-relocating-australia-and-where"
+      </li>
     </ul>
   </main>
 
   <site-footer></site-footer>
 </body>
+
 </html>
