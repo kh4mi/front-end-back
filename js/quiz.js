@@ -238,6 +238,26 @@
   });
   consent.addEventListener('change', function () { if (consent.checked) consentError.hidden = true; });
 
+  // Reset: every answer back to its starting value (and forget saved answers), then back to question 1
+  $('#resetBtn').addEventListener('click', function () {
+    const d = SM.DEFAULT_PREFS;
+    state.order = d.order.slice();
+    state.weights = Object.assign({}, d.weights);
+    state.budget = { min: d.budget.min, max: d.budget.max };
+    state.beds = d.beds;
+    state.destination = d.destination;
+    state.customDest = null;
+    SM.store.remove('prefs');
+    budgetMin.value = ''; budgetMax.value = ''; budgetError.hidden = true;
+    destText.value = '';
+    $('input[name="destination"][value="' + state.destination + '"]').checked = true;
+    $('input[name="beds"][value="' + state.beds + '"]').checked = true;
+    showPlaceBox();
+    renderRankList();
+    live.textContent = 'Your answers have been reset.';
+    showStep(1, true);
+  });
+
   // Enter key shouldn't submit the form
   $('#quizForm').addEventListener('submit', (e) => e.preventDefault());
 
