@@ -139,6 +139,14 @@
   margin-top: 2rem;
 }
 
+/* Reset sits between Back and Next, quieter than both */
+.quiz-reset {
+  margin-left: auto;
+  background: none;
+  text-decoration: underline;
+  font-weight: 600;
+}
+
 @media (max-width: 800px) {
   .quiz-layout {
     grid-template-columns: 1fr;
@@ -999,7 +1007,7 @@ fieldset.choices legend {
 
 /* ---------- How it works ---------- */
 .how {
-  padding-top: 2.5rem;
+  padding-top: 4rem;
   max-width: 60rem;
 }
 
